@@ -4,10 +4,6 @@ import { login, register } from "./services/auth/routes";
 
 const server: fastify.FastifyInstance = fastify({ logger: true });
 
-server.get("/ping", async (request, reply) => {
-  return { pong: "it worked!" };
-});
-
 server.post(
   "/register",
   { schema: { body: register.schema } },

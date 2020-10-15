@@ -10,3 +10,8 @@ services:
       POSTGRES_USER: codename
       POSTGRES_PASSWORD: codename
       POSTGRES_DB: codename
+  redis:
+    container_name: "redis"
+    image: "redis"
+    ports:
+      - "6379:6379"
