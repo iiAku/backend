@@ -7,9 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Auth {
+  id        String
+  token     String   @unique
+  ip        String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  User      User     @relation(fields: [id], references: [id])
+
+  @@id([id, token])
+}
+
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+  Auth      Auth[]
 }

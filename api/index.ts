@@ -1,21 +1,33 @@
-import * as fastify from "fastify";
+import * as fastify from "fastify"
+import * as fastifyCookie from "fastify-cookie"
 
-import { login, register } from "./services/auth/routes";
+import { login, logout, register } from "./services/auth/routes"
 
-const server: fastify.FastifyInstance = fastify({ logger: true });
+const server: fastify.FastifyInstance = fastify({ logger: true })
 
-server.post(
-  "/register",
-  { schema: { body: register.schema } },
-  register.handler
-);
+server.register(fastifyCookie)
 
-server.post("/login", { schema: { body: login.schema } }, login.handler);
+server.route({
+  method: "POST",
+  url: "/register",
+  schema: register.schema,
+  preHandler: register.preHandler,
+  handler: register.handler,
+})
+
+server.route({
+  method: "POST",
+  url: "/logout",
+  preHandler: logout.preHandler,
+  handler: logout.handler,
+})
+
+server.post("/login", { schema: { body: login.schema } }, login.handler)
 
 server.listen(3000, (err) => {
   if (err) {
-    server.log.error(err);
-    process.exit(1);
+    server.log.error(err)
+    process.exit(1)
   }
-  server.log.info(`server listening on ${server.server.address().port}`);
-});
+  server.log.info(`server listening on ${server.server.address().port}`)
+})

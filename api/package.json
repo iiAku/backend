@@ -1,11 +1,15 @@
 {
   "dependencies": {
     "@prisma/cli": "2.9.0",
-    "@prisma/client": "2.9.0",
+    "@prisma/client": "^2.9.0",
     "@types/node": "^14.11.8",
     "bcrypt": "^5.0.0",
+    "fast-json-stringify": "^2.2.9",
     "fastify": "^3.6.0",
+    "fastify-cookie": "^4.1.0",
     "keyv": "^4.0.3",
-    "uuid": "^8.3.1"
+    "secure-json-parse": "^2.1.0",
+    "uuid": "^8.3.1",
+    "validator": "^13.1.17"
   }
 }
