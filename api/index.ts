@@ -10,8 +10,6 @@ import {
   resetPassword
 } from './services/auth/routes'
 
-import {AddressInfo} from 'net'
-
 const server: fastify.FastifyInstance = fastify({logger: true})
 
 server.register(fastifyCookie)

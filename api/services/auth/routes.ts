@@ -53,6 +53,7 @@ const registerHandler = async (request, reply) => {
   )
   const user = await prisma.user.create({
     data: {
+      id: uuidv4(),
       email,
       password: hashedPassword,
     },
@@ -177,7 +178,7 @@ const replyetPasswordHandler = async (request, reply) => {
     },
   })
   await Promise.all([updatePassword, keyv.delete(forgotKey)])
-  return reply.code(200).send({ message: "replyET_PASSWORD_SUCCEEDED" })
+  return reply.code(200).send({ message: "RESET_PASSWORD_SUCCEEDED" })
 }
 
 const deleteMeHandler = async (request, reply) => {
@@ -258,7 +259,7 @@ export const forgotPassword = {
   handler: forgotPasswordHandler,
 }
 
-export const replyetPassword = {
+export const resetPassword = {
   schema: {
     schema: {
       body: {
