@@ -1,7 +1,13 @@
 import * as fastify from "fastify"
 import * as fastifyCookie from "fastify-cookie"
 
-import { login, logout, register } from "./services/auth/routes"
+import {
+  forgotPassword,
+  login,
+  logout,
+  register,
+  resetPassword,
+} from "./services/auth/routes"
 
 const server: fastify.FastifyInstance = fastify({ logger: true })
 
@@ -22,7 +28,26 @@ server.route({
   handler: logout.handler,
 })
 
-server.post("/login", { schema: { body: login.schema } }, login.handler)
+server.route({
+  method: "POST",
+  url: "/login",
+  schema: login.schema,
+  handler: login.handler,
+})
+
+server.route({
+  method: "POST",
+  url: "/forgot-password",
+  schema: forgotPassword.schema,
+  handler: forgotPassword.handler,
+})
+
+server.route({
+  method: "POST",
+  url: "/reset-password",
+  schema: resetPassword.schema,
+  handler: resetPassword.handler,
+})
 
 server.listen(3000, (err) => {
   if (err) {
