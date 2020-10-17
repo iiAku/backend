@@ -1,8 +1,6 @@
 import * as Keyv from "keyv"
 import * as bcrypt from "bcrypt"
 import * as config from "../config.json"
-import * as jsonparse from "secure-json-parse"
-import * as stringify from "fast-json-stringify"
 import * as validator from "validator"
 
 import { PrismaClient } from "@prisma/client"
@@ -105,7 +103,6 @@ const logoutHandler = async (req, res) => {
     return res.code(403).send()
   }
   const { token } = req.auth
-  console.log("trying to delete", { where: { token } })
   await Promise.all([
     prisma.auth.delete({ where: { token } }),
     keyv.delete(token),
