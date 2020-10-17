@@ -6,21 +6,21 @@ import * as validator from "validator"
 import { PrismaClient } from "@prisma/client"
 import { v4 as uuidv4 } from "uuid"
 
-const isDev = config.env === "dev" ? true : false
+const isDev = config.env === "dev"
 const prisma = new PrismaClient()
-// const keyv = new Keyv("redis://user:pass@localhost:6379")
+// Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse })
 
-const authPreHandler = async (req, res, done) => {
+const authPreHandler = async (request, reply, done) => {
   if (
-    !req.cookies ||
-    !(config.AUTH_COOKIE_NAME in req.cookies) ||
-    !validator.isUUID(req.cookies[config.AUTH_COOKIE_NAME], 4)
+    !request.cookies ||
+    !(config.AUTH_COOKIE_NAME in request.cookies) ||
+    !validator.isUUID(request.cookies[config.AUTH_COOKIE_NAME], 4)
   ) {
-    return res.code(403).send()
+    return reply.code(403).send({ message: "INVALID_COOKIE" })
   }
 
-  const { token } = req.cookies
+  const { token } = request.cookies
   let auth = await keyv.get(token)
 
   if (!auth) {
@@ -29,21 +29,24 @@ const authPreHandler = async (req, res, done) => {
       include: { User: true },
     })
     if (!userFromToken) {
-      return res.code(403).send()
+      return reply.code(403).send({ message: "EXPIRED_COOKIE" })
     }
+
     auth = userFromToken
   }
+
   await keyv.set(token, auth, 120 * 1000)
-  req.auth = auth
+  request.auth = auth
   done()
 }
 
-const registerHandler = async (req, res) => {
-  const { email, password } = req.body
+const registerHandler = async (request, reply) => {
+  const { email, password } = request.body
   const isEmailExist = await emailExist(email)
   if (isEmailExist) {
-    return res.code(200).send({ message: "EMAIL_ALREADY_IN_USE" })
+    return reply.code(200).send({ message: "EMAIL_ALREADY_IN_USE" })
   }
+
   const hashedPassword: string = await bcrypt.hash(
     password,
     config.PASSWORD_SALT_ROUNDS
@@ -55,41 +58,43 @@ const registerHandler = async (req, res) => {
     },
   })
 
-  return res.code(200).send({
+  return reply.code(200).send({
     data: { user },
     message: "REGISTERED",
   })
 }
 
-const loginHandler = async (req, res) => {
-  const { email, password } = req.body
+const loginHandler = async (request, reply) => {
+  const { email, password } = request.body
   const user = await prisma.user.findOne({
     where: { email },
   })
   if (!user) {
-    return res.code(200).send({
+    return reply.code(200).send({
       statusCode: 400,
       message: "INVALID_CREDENTIALS",
     })
   }
+
   const compare = await bcrypt.compare(password, user.password)
   if (!compare) {
-    return res.code(200).send({
+    return reply.code(200).send({
       statusCode: 400,
       message: "INVALID_CREDENTIALS",
     })
   }
+
   const token = uuidv4()
   await prisma.auth.create({
     data: {
       token,
-      ip: req.ip,
+      ip: request.ip,
       User: {
         connect: { id: user.id },
       },
     },
   })
-  return res.setCookie(config.AUTH_COOKIE_NAME, token).send({
+  return reply.setCookie(config.AUTH_COOKIE_NAME, token).send({
     data: {
       session_token: token,
       ...user,
@@ -98,29 +103,32 @@ const loginHandler = async (req, res) => {
   })
 }
 
-const logoutHandler = async (req, res) => {
-  if (!req.auth || !("User" in req.auth)) {
-    return res.code(403).send()
+const logoutHandler = async (request, reply) => {
+  if (!request.auth || !("User" in request.auth)) {
+    return reply.code(403).send()
   }
-  const { token } = req.auth
+
+  const { token } = request.auth
   await Promise.all([
     prisma.auth.delete({ where: { token } }),
     keyv.delete(token),
   ])
-  res.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
+  reply.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
 }
 
-const forgotPasswordHandler = async (req, res) => {
-  const { email } = req.body
+const forgotPasswordHandler = async (request, reply) => {
+  const { email } = request.body
   if (!email) {
-    return res.code(400).send()
+    return reply.code(400).send()
   }
+
   const userFromEmail = await prisma.user.findOne({ where: { email } })
   if (userFromEmail === null) {
-    return res.code(400).send()
+    return reply.code(400).send()
   }
-  const resetToken = uuidv4()
-  const sendMail = () => {
+
+  const resetToken: string = uuidv4()
+  const sendMail = async () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // TODO - send email to user
@@ -129,6 +137,7 @@ const forgotPasswordHandler = async (req, res) => {
       }, 500)
     })
   }
+
   await Promise.all([
     await keyv.set(
       `forgot:${resetToken}`,
@@ -138,21 +147,25 @@ const forgotPasswordHandler = async (req, res) => {
     sendMail,
   ])
   console.log("resetToken", resetToken)
-  res.code(200).send({ message: "GENERATE_TOKEN_SENT" })
+  reply.code(200).send({ message: "GENERATE_TOKEN_SENT" })
 }
 
-const resetPasswordHandler = async (req, res) => {
-  const { token, newPassword } = req.body
-  console.log(req.body)
+const replyetPasswordHandler = async (request, reply) => {
+  const {
+    token,
+    newPassword,
+  }: { token: string; newPassword: string } = request.body
   if (!token || !newPassword) {
-    return res.code(400).send()
+    return reply.code(400).send()
   }
+
   const forgotKey = `forgot:${token}`
   const isValidToken = await keyv.get(forgotKey)
   console.log(isValidToken)
   if (!isValidToken) {
-    return res.code(400).send({ message: "INVALID_OR_EXPIRED_TOKEN" })
+    return reply.code(400).send({ message: "INVALID_OR_EXPIRED_TOKEN" })
   }
+
   const hashedNewPassword: string = await bcrypt.hash(
     newPassword,
     config.PASSWORD_SALT_ROUNDS
@@ -164,7 +177,24 @@ const resetPasswordHandler = async (req, res) => {
     },
   })
   await Promise.all([updatePassword, keyv.delete(forgotKey)])
-  return res.code(200).send({ message: "RESET_PASSWORD_SUCCEEDED" })
+  return reply.code(200).send({ message: "replyET_PASSWORD_SUCCEEDED" })
+}
+
+const deleteMeHandler = async (request, reply) => {
+  if (!request.auth || !("User" in request.auth)) {
+    return reply.code(403).send()
+  }
+
+  const { id } = request.auth
+  if (!id) {
+    return reply.code(400).send()
+  }
+
+  // Await prisma.user.delete({ where: { id } })
+  reply
+    .code(200)
+    .clearCookie(config.AUTH_COOKIE_NAME)
+    .send({ message: "USER_DELETED" })
 }
 
 const emailExist = async (email) => {
@@ -176,6 +206,7 @@ const emailExist = async (email) => {
   if (userWithEmail !== null) {
     return true
   }
+
   return false
 }
 
@@ -207,6 +238,11 @@ export const logout = {
   preHandler: authPreHandler,
 }
 
+export const deleteMe = {
+  handler: deleteMeHandler,
+  preHandler: authPreHandler,
+}
+
 export const forgotPassword = {
   schema: {
     schema: {
@@ -222,7 +258,7 @@ export const forgotPassword = {
   handler: forgotPasswordHandler,
 }
 
-export const resetPassword = {
+export const replyetPassword = {
   schema: {
     schema: {
       body: {
@@ -235,5 +271,5 @@ export const resetPassword = {
       },
     },
   },
-  handler: resetPasswordHandler,
+  handler: replyetPasswordHandler,
 }
