@@ -1,6 +1,5 @@
 {
 	"space": true,
     "semicolon": false,
-    "prettier": true,
-    "esnext":false
+    "prettier": true
 }
