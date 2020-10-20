@@ -1,0 +1,5 @@
+{
+  "password": "superSecretPassword",
+  "policies": "admin,default",
+  "bound_cidrs": ["127.0.0.1/32", "128.252.0.0/16"]
+}
