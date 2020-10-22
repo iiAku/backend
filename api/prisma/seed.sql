@@ -8,7 +8,7 @@ CREATE TABLE "public"."User" (
 CREATE TABLE "public"."Auth" (
   "id" uuid NOT NULL,
   "token" uuid UNIQUE NOT NULL,
-  "userAgent" VARCHAR(255),
+  "ip" VARCHAR(45),
   "createdAt" timestamp(6) with time zone DEFAULT now() NOT NULL,
   "updatedAt" timestamp(6) with time zone DEFAULT now() NOT NULL,
   PRIMARY KEY("id","token"),

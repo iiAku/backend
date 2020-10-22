@@ -1,21 +1,25 @@
 import * as Keyv from 'keyv'
 import * as bcrypt from 'bcrypt'
-import * as config from '../config.json'
-import * as validator from 'validator'
 
+import {v4 as uuidv4, validate, version} from 'uuid'
+
+import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
-import {v4 as uuidv4} from 'uuid'
+import {config} from '../config'
 
 const isDev = config.env === 'dev'
-const prisma = new PrismaClient()
+//const prisma = new PrismaClient()
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
-const authPreHandler = async (request, reply, done) => {
+const isUUID = (uuid: string, uuidVersion: number) =>
+  validate(uuid) && version(uuid) === uuidVersion
+
+const authPreHandler = async (request: any, reply: FastifyReply, done: any) => {
   if (
     !request.cookies ||
     !(config.AUTH_COOKIE_NAME in request.cookies) ||
-    !validator.isUUID(request.cookies[config.AUTH_COOKIE_NAME], 4)
+    !isUUID(request.cookies[config.AUTH_COOKIE_NAME], 4)
   ) {
     return reply.code(403).send({message: 'INVALID_COOKIE'})
   }
@@ -40,7 +44,7 @@ const authPreHandler = async (request, reply, done) => {
   done()
 }
 
-const registerHandler = async (request, reply) => {
+const registerHandler = async (request: any, reply: FastifyReply) => {
   const {email, password} = request.body
   const isEmailExist = await emailExist(email)
   if (isEmailExist) {
@@ -65,7 +69,7 @@ const registerHandler = async (request, reply) => {
   })
 }
 
-const loginHandler = async (request, reply) => {
+const loginHandler = async (request: any, reply: FastifyReply) => {
   const {email, password} = request.body
   const user = await prisma.user.findOne({
     where: {email}
@@ -104,7 +108,7 @@ const loginHandler = async (request, reply) => {
   })
 }
 
-const logoutHandler = async (request, reply) => {
+const logoutHandler = async (request: any, reply: FastifyReply) => {
   if (!request.auth || !('User' in request.auth)) {
     return reply.code(403).send()
   }
@@ -114,7 +118,7 @@ const logoutHandler = async (request, reply) => {
   reply.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
 }
 
-const forgotPasswordHandler = async (request, reply) => {
+const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
   const {email} = request.body
   if (!email) {
     return reply.code(400).send()
@@ -129,7 +133,7 @@ const forgotPasswordHandler = async (request, reply) => {
   const sendMail = async () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // TODO - send email to user
+        // Send email to user
         console.log('Email sent')
         resolve()
       }, 500)
@@ -148,7 +152,7 @@ const forgotPasswordHandler = async (request, reply) => {
   reply.code(200).send({message: 'GENERATE_TOKEN_SENT'})
 }
 
-const replyetPasswordHandler = async (request, reply) => {
+const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
   const {
     token,
     newPassword
@@ -178,7 +182,7 @@ const replyetPasswordHandler = async (request, reply) => {
   return reply.code(200).send({message: 'RESET_PASSWORD_SUCCEEDED'})
 }
 
-const deleteMeHandler = async (request, reply) => {
+const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   if (!request.auth || !('User' in request.auth)) {
     return reply.code(403).send()
   }
@@ -195,7 +199,7 @@ const deleteMeHandler = async (request, reply) => {
     .send({message: 'USER_DELETED'})
 }
 
-const emailExist = async (email) => {
+const emailExist = async (email: string) => {
   const userWithEmail = await prisma.user.findOne({
     where: {
       email
@@ -211,19 +215,16 @@ const emailExist = async (email) => {
 // exported routes
 export const register = {
   schema: {
-    schema: {
-      body: {
-        type: 'object',
-        required: ['email', 'password'],
-        properties: {
-          email: {type: 'string', format: 'email'},
-          password: {type: 'string'}
-        }
+    body: {
+      type: 'object',
+      required: ['email', 'password'],
+      properties: {
+        email: {type: 'string', format: 'email'},
+        password: {type: 'string'}
       }
     }
   },
-  handler: registerHandler,
-  preHandler: authPreHandler
+  handler: registerHandler
 }
 
 export const login = {
@@ -243,13 +244,11 @@ export const deleteMe = {
 
 export const forgotPassword = {
   schema: {
-    schema: {
-      body: {
-        type: 'object',
-        required: ['email'],
-        properties: {
-          email: {type: 'string', format: 'email'}
-        }
+    body: {
+      type: 'object',
+      required: ['email'],
+      properties: {
+        email: {type: 'string', format: 'email'}
       }
     }
   },
@@ -258,16 +257,14 @@ export const forgotPassword = {
 
 export const resetPassword = {
   schema: {
-    schema: {
-      body: {
-        type: 'object',
-        required: ['token', 'newPassword'],
-        properties: {
-          token: {type: 'string', format: 'uuid'},
-          newPassword: {type: 'string'}
-        }
+    body: {
+      type: 'object',
+      required: ['token', 'newPassword'],
+      properties: {
+        token: {type: 'string', format: 'uuid'},
+        newPassword: {type: 'string'}
       }
     }
   },
-  handler: replyetPasswordHandler
+  handler: resetPasswordHandler
 }
