@@ -6,14 +6,28 @@ import {v4 as uuidv4, validate, version} from 'uuid'
 import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
 import {config} from '../config'
+import {messages} from '../messages'
 
 const isDev = config.env === 'dev'
-//const prisma = new PrismaClient()
+const prisma = new PrismaClient()
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 const isUUID = (uuid: string, uuidVersion: number) =>
   validate(uuid) && version(uuid) === uuidVersion
+
+const emailExist = async (email: string) => {
+  const userWithEmail = await prisma.user.findOne({
+    where: {
+      email
+    }
+  })
+  if (userWithEmail !== null) {
+    return true
+  }
+
+  return false
+}
 
 const authPreHandler = async (request: any, reply: FastifyReply, done: any) => {
   if (
@@ -21,7 +35,7 @@ const authPreHandler = async (request: any, reply: FastifyReply, done: any) => {
     !(config.AUTH_COOKIE_NAME in request.cookies) ||
     !isUUID(request.cookies[config.AUTH_COOKIE_NAME], 4)
   ) {
-    return reply.code(403).send({message: 'INVALID_COOKIE'})
+    return reply.code(401).send({message: messages.auth.INVALID_COOKIE})
   }
 
   const {token} = request.cookies
@@ -33,7 +47,7 @@ const authPreHandler = async (request: any, reply: FastifyReply, done: any) => {
       include: {User: true}
     })
     if (!userFromToken) {
-      return reply.code(403).send({message: 'EXPIRED_COOKIE'})
+      return reply.code(403).send({message: messages.auth.EXPIRED_COOKIE})
     }
 
     auth = userFromToken
@@ -48,7 +62,7 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
   const {email, password} = request.body
   const isEmailExist = await emailExist(email)
   if (isEmailExist) {
-    return reply.code(200).send({message: 'EMAIL_ALREADY_IN_USE'})
+    return reply.code(400).send({message: messages.auth.EMAIL_ALREADY_IN_USE})
   }
 
   const hashedPassword: string = await bcrypt.hash(
@@ -65,7 +79,7 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
 
   return reply.code(200).send({
     data: {user},
-    message: 'REGISTERED'
+    message: messages.auth.REGISTERED
   })
 }
 
@@ -75,17 +89,15 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
     where: {email}
   })
   if (!user) {
-    return reply.code(200).send({
-      statusCode: 400,
-      message: 'INVALID_CREDENTIALS'
+    return reply.code(401).send({
+      message: messages.auth.INVALID_CREDENTIALS
     })
   }
 
   const compare = await bcrypt.compare(password, user.password)
   if (!compare) {
-    return reply.code(200).send({
-      statusCode: 400,
-      message: 'INVALID_CREDENTIALS'
+    return reply.code(401).send({
+      message: messages.auth.INVALID_CREDENTIALS
     })
   }
 
@@ -104,13 +116,13 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
       session_token: token,
       ...user
     },
-    message: 'LOGGED_IN'
+    message: messages.auth.LOGGED_IN
   })
 }
 
 const logoutHandler = async (request: any, reply: FastifyReply) => {
   if (!request.auth || !('User' in request.auth)) {
-    return reply.code(403).send()
+    return reply.code(401).send()
   }
 
   const {token} = request.auth
@@ -126,7 +138,7 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
 
   const userFromEmail = await prisma.user.findOne({where: {email}})
   if (userFromEmail === null) {
-    return reply.code(400).send()
+    return reply.code(401).send()
   }
 
   const resetToken: string = uuidv4()
@@ -149,7 +161,7 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
     sendMail
   ])
   console.log('resetToken', resetToken)
-  reply.code(200).send({message: 'GENERATE_TOKEN_SENT'})
+  reply.code(200).send({message: messages.auth.GENERATE_TOKEN_SENT})
 }
 
 const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
@@ -165,7 +177,9 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
   const isValidToken = await keyv.get(forgotKey)
   console.log(isValidToken)
   if (!isValidToken) {
-    return reply.code(400).send({message: 'INVALID_OR_EXPIRED_TOKEN'})
+    return reply
+      .code(401)
+      .send({message: messages.auth.INVALID_OR_EXPIRED_TOKEN})
   }
 
   const hashedNewPassword: string = await bcrypt.hash(
@@ -179,7 +193,7 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
     }
   })
   await Promise.all([updatePassword, keyv.delete(forgotKey)])
-  return reply.code(200).send({message: 'RESET_PASSWORD_SUCCEEDED'})
+  return reply.code(200).send({message: messages.auth.RESET_PASSWORD_SUCCEEDED})
 }
 
 const deleteMeHandler = async (request: any, reply: FastifyReply) => {
@@ -196,20 +210,7 @@ const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   reply
     .code(200)
     .clearCookie(config.AUTH_COOKIE_NAME)
-    .send({message: 'USER_DELETED'})
-}
-
-const emailExist = async (email: string) => {
-  const userWithEmail = await prisma.user.findOne({
-    where: {
-      email
-    }
-  })
-  if (userWithEmail !== null) {
-    return true
-  }
-
-  return false
+    .send({message: messages.auth.USER_DELETED})
 }
 
 // exported routes
