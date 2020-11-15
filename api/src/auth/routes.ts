@@ -126,7 +126,7 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
   reply.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
 }
 
-const logoutOthersHandler = async (request: any, reply: FastifyReply) => {
+const logoutAllHandler = async (request: any, reply: FastifyReply) => {
   const {token, id} = request.auth
   await prisma.auth.deleteMany({
     where: {id, NOT: {token}}
@@ -250,8 +250,8 @@ export const logout = {
   preHandler: authPreHandler
 }
 
-export const logoutOthers = {
-  handler: logoutOthersHandler,
+export const logoutAll = {
+  handler: logoutAllHandler,
   preHandler: authPreHandler
 }
 
