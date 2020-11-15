@@ -64,85 +64,51 @@
 // }
 
 import * as AWS from 'aws-sdk'
-import * as aws4 from 'aws4'
 import * as fs from 'fs'
-import * as p from 'phin'
-import * as xml2js from 'xml2js'
 
+import {IBucketOptions} from './utils'
 import {config} from './config.dev'
 import {getBucketEndpoint} from './utils'
 
-const DEFAULT_SERVICE = 's3'
-const DEFAULT_PORT = 443
+const providers = Object.keys(config)
 
-// Const CURRENT_PROVIDER = 'scw'
-const CURRENT_PROVIDER = 'scw'
-const currentConfig = config[CURRENT_PROVIDER]
+const getS3Instance = (s3config: any, options?: IBucketOptions) => {
+  let customConf = s3config
 
-const certs = {
-  key: fs.readFileSync('./certs/key.pem'),
-  cert: fs.readFileSync('./certs/cert.pem')
-}
-
-const generateRequest = (
-  method: string,
-  url: URL,
-  path: string,
-  config: any,
-  port: number = DEFAULT_PORT
-) => {
-  const parameters = {
-    hash: {
-      service: DEFAULT_SERVICE,
-      region: config.region,
-      method,
-      path,
-      host: url.hostname
-    }
+  if (options && options.filePath) {
+    const {hostname} = getBucketEndpoint(options)
+    customConf.endpoint = hostname
+    customConf.s3BucketEndpoint = true
   }
-  const hash = aws4.sign(parameters.hash, {
-    accessKeyId: config.accessKeyId,
-    secretAccessKey: config.secretAccessKey
-  })
-
-  return {
-    url: url.href,
-    port,
-    method,
-    path,
-    headers: hash.headers
-  }
+  console.log('customConf', customConf)
+  const awsConfig = new AWS.Config(customConf)
+  return new AWS.S3(awsConfig)
 }
-
-const bucket = (bucketName: string, method: string) =>
-  generateRequest(
-    method,
-    getBucketEndpoint(bucketName, currentConfig.region, CURRENT_PROVIDER),
-    '/',
-    currentConfig
-  )
-const getBucket = (bucketName: string) => bucket(bucketName, 'GET')
-const putBucket = (bucketName: string) => bucket(bucketName, 'PUT')
-const deleteBucket = (bucketName: string) => bucket(bucketName, 'DELETE')
-const headBucket = (bucketName: string) => bucket(bucketName, 'HEAD')
 
 const main = async () => {
-  const getBucketQuery = getBucket('test-1-2-1-3')
-
-  const response = await p({
-    ...getBucketQuery,
-    ...certs
-  })
-
-  console.log({
-    headers: response.headers,
-    code: response.statusCode,
-    body: JSON.stringify(
-      await xml2js.parseStringPromise(response.body.toString()),
-      null,
-      2
-    )
-  })
+  for (let provider of providers) {
+    console.log('Sending data for provider', provider)
+    const s3Credentials = config[provider]
+    console.log('s3Credentials', s3Credentials)
+    const bucketName = '2ca4eec7-e08b-4ebb-8206-67ca457cfc07'
+    const fileName = 'file.txt'
+    let s3 = getS3Instance(s3Credentials, {
+      bucketName,
+      regionName: s3Credentials.region,
+      providerName: provider
+    })
+    // const params = {Bucket: bucketName}
+    // console.log(params)
+    // CREATE BUCKET
+    // await s3.createBucket(params).promise()
+    // console.log('bucket created', bucketName)
+    const rs = fs.createReadStream('./rnd/' + fileName, 'utf8')
+    try {
+      await s3.upload({Bucket: bucketName, Key: fileName, Body: rs}).promise()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 main()

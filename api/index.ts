@@ -3,31 +3,39 @@ import {
   forgotPassword,
   login,
   logout,
+  logoutOthers,
   register,
   resetPassword
-} from './services/auth/routes'
+} from './src/auth/routes'
 import fastify, {FastifyInstance} from 'fastify'
 
 import {AddressInfo} from 'net'
 import fastifyCookie from 'fastify-cookie'
 
-const server: FastifyInstance = fastify({logger: true})
+export const PORT = 3000
+export const opts = {logger: true}
+export const build = (opts = {}) => {
+  const server = fastify(opts)
+  server.register(fastifyCookie)
 
-server.register(fastifyCookie)
+  server.route({method: 'POST', url: '/register', ...register})
+  server.route({method: 'DELETE', url: '/logout', ...logout})
+  server.route({method: 'DELETE', url: '/logout-others', ...logoutOthers})
+  server.route({method: 'POST', url: '/login', ...login})
+  server.route({method: 'POST', url: '/forgot-password', ...forgotPassword})
+  server.route({method: 'POST', url: '/reset-password', ...resetPassword})
+  server.route({method: 'DELETE', url: '/me', ...deleteMe})
+  return server
+}
 
-server.route({method: 'POST', url: '/register', ...register})
-server.route({method: 'POST', url: '/logout', ...logout})
-server.route({method: 'POST', url: '/login', ...login})
-server.route({method: 'POST', url: '/forgot-password', ...forgotPassword})
-server.route({method: 'POST', url: '/reset-password', ...resetPassword})
-server.route({method: 'DELETE', url: '/me', ...deleteMe})
+const serverInstance = build(opts)
 
-server.listen(3000, (err) => {
+serverInstance.listen(PORT, (err) => {
   if (err) {
-    server.log.error(err)
+    serverInstance.log.error(err)
     throw new Error('something went wrong')
   }
 
-  const {port} = server.server.address() as AddressInfo
-  server.log.info(`server listening on ${port}`)
+  const {port} = serverInstance.server.address() as AddressInfo
+  serverInstance.log.info(`server listening on ${port}`)
 })

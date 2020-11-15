@@ -1,21 +1,26 @@
 {
   "scripts": {
-    "dev": "tsc **/*.ts -w"
+    "dev": "npx prisma introspect --force && npx prisma generate && tsc -w",
+    "watch": "tsc -w"
   },
   "dependencies": {
-    "@prisma/cli": "2.9.0",
-    "@prisma/client": "^2.9.0",
+    "@prisma/cli": "^2.11.0",
+    "@prisma/client": "^2.11.0",
     "@types/bcrypt": "^3.0.0",
     "@types/keyv": "^3.1.1",
     "@types/node": "^14.11.8",
     "@types/uuid": "^8.3.0",
+    "ava": "^3.13.0",
     "aws-sdk": "^2.777.0",
     "aws4": "^1.10.1",
     "bcrypt": "^5.0.0",
     "fastify": "^3.6.0",
     "fastify-cookie": "^4.1.0",
+    "fs": "^0.0.1-security",
+    "global": "^4.4.0",
     "https": "^1.0.0",
     "keyv": "^4.0.3",
+    "nanoid": "^3.1.16",
     "phin": "^3.5.0",
     "pump": "^3.0.0",
     "uuid": "^8.3.1",

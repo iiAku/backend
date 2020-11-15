@@ -13,7 +13,7 @@ const prisma = new PrismaClient()
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
-const isUUID = (uuid: string, uuidVersion: number) =>
+export const isUUID = (uuid: string, uuidVersion: number) =>
   validate(uuid) && version(uuid) === uuidVersion
 
 const emailExist = async (email: string) => {
@@ -121,13 +121,17 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
 }
 
 const logoutHandler = async (request: any, reply: FastifyReply) => {
-  if (!request.auth || !('User' in request.auth)) {
-    return reply.code(401).send()
-  }
-
   const {token} = request.auth
   await Promise.all([prisma.auth.delete({where: {token}}), keyv.delete(token)])
   reply.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
+}
+
+const logoutOthersHandler = async (request: any, reply: FastifyReply) => {
+  const {token, id} = request.auth
+  await prisma.auth.deleteMany({
+    where: {id, NOT: {token}}
+  })
+  reply.code(200).send()
 }
 
 const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
@@ -154,6 +158,11 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
 
   await Promise.all([
     await keyv.set(
+      `forgot:${email}`,
+      resetToken,
+      isDev ? 300 * 1000 : config.FORGOT_PASSWORD_EXPIRY_SEC
+    ),
+    await keyv.set(
       `forgot:${resetToken}`,
       userFromEmail,
       isDev ? 300 * 1000 : config.FORGOT_PASSWORD_EXPIRY_SEC
@@ -175,8 +184,11 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
 
   const forgotKey = `forgot:${token}`
   const isValidToken = await keyv.get(forgotKey)
-  console.log(isValidToken)
-  if (!isValidToken) {
+  const emailKey = `forgot:${isValidToken.email}`
+  const lastIssuedToken = await keyv.get(emailKey)
+  console.log({isValidToken, lastIssuedToken})
+
+  if (!isValidToken || lastIssuedToken !== token) {
     return reply
       .code(401)
       .send({message: messages.auth.INVALID_OR_EXPIRED_TOKEN})
@@ -235,6 +247,11 @@ export const login = {
 
 export const logout = {
   handler: logoutHandler,
+  preHandler: authPreHandler
+}
+
+export const logoutOthers = {
+  handler: logoutOthersHandler,
   preHandler: authPreHandler
 }
 
