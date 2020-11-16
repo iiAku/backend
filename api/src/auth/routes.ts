@@ -209,10 +209,6 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
 }
 
 const deleteMeHandler = async (request: any, reply: FastifyReply) => {
-  if (!request.auth || !('User' in request.auth)) {
-    return reply.code(403).send()
-  }
-
   const {id} = request.auth
   if (!id) {
     return reply.code(400).send()

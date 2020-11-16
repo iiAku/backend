@@ -3,7 +3,7 @@ import {
   forgotPassword,
   login,
   logout,
-  logoutOthers,
+  logoutAll,
   register,
   resetPassword
 } from './src/auth/routes'
@@ -20,7 +20,7 @@ export const build = (opts = {}) => {
 
   server.route({method: 'POST', url: '/register', ...register})
   server.route({method: 'DELETE', url: '/logout', ...logout})
-  server.route({method: 'DELETE', url: '/logout-others', ...logoutOthers})
+  server.route({method: 'DELETE', url: '/logout-all', ...logoutAll})
   server.route({method: 'POST', url: '/login', ...login})
   server.route({method: 'POST', url: '/forgot-password', ...forgotPassword})
   server.route({method: 'POST', url: '/reset-password', ...resetPassword})
