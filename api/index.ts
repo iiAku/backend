@@ -1,16 +1,11 @@
-import {
-  deleteMe,
-  forgotPassword,
-  login,
-  logout,
-  logoutAll,
-  register,
-  resetPassword
-} from './src/auth/routes'
 import fastify, {FastifyInstance} from 'fastify'
 
 import {AddressInfo} from 'net'
+import {authRoutes} from './src/auth/routes'
 import fastifyCookie from 'fastify-cookie'
+import {merchantRoutes} from './src/merchant/routes'
+
+const routes = authRoutes.concat(merchantRoutes)
 
 export const PORT = 3000
 export const opts = {logger: true}
@@ -18,19 +13,15 @@ export const build = (opts = {}) => {
   const server = fastify(opts)
   server.register(fastifyCookie)
 
-  server.route({method: 'POST', url: '/register', ...register})
-  server.route({method: 'DELETE', url: '/logout', ...logout})
-  server.route({method: 'DELETE', url: '/logout-all', ...logoutAll})
-  server.route({method: 'POST', url: '/login', ...login})
-  server.route({method: 'POST', url: '/forgot-password', ...forgotPassword})
-  server.route({method: 'POST', url: '/reset-password', ...resetPassword})
-  server.route({method: 'DELETE', url: '/me', ...deleteMe})
+  for (const route of routes) {
+    server.route(route)
+  }
   return server
 }
 
 const serverInstance = build(opts)
 
-serverInstance.listen(PORT, (err) => {
+serverInstance.listen(PORT, (err: any) => {
   if (err) {
     serverInstance.log.error(err)
     throw new Error('something went wrong')

@@ -8,20 +8,38 @@ datasource db {
 }
 
 model Auth {
-  id        String
-  token     String   @unique
+  uid       String
+  id        String   @unique
   ip        String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  User      User     @relation(fields: [id], references: [id])
+  User      User     @relation(fields: [uid], references: [id])
 
-  @@id([id, token])
+  @@id([uid, id])
+}
+
+model Merchant {
+  uid           String
+  id            String  @unique
+  name          String
+  description   String?
+  siret         String
+  address_line  String
+  address_line2 String?
+  city          String
+  state         String
+  zip           String
+  country       String
+  User          User    @relation(fields: [uid], references: [id])
+
+  @@id([uid, id])
 }
 
 model User {
-  id        String   @id
-  email     String   @unique
+  id        String     @id
+  email     String     @unique
   password  String
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
   Auth      Auth[]
+  Merchant  Merchant[]
 }
