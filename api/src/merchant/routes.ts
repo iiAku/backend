@@ -15,42 +15,108 @@ const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 /**
  * Add a new merchant
  *
- * @name Merchant
+ * @namespace Merchant
  * @path {POST} /merchant
  * @code {200} if the request is successful
  * @code {400} if email already exist
- * @body {String} email Email used for registration
- * @body {String} password Password used for registration
+ * @body {string} name
+ * @body {string} description
+ * @body {string} siret
+ * @body {string} address_line
+ * @body {string} address_line2
+ * @body {string} city
+ * @body {string} state
+ * @body {string} zip
+ * @body {string} country
  */
 const addMerchantHandler = async (request: any, reply: FastifyReply) => {
   const {uid} = request.auth
-  const insert = {
-    uid,
-    id: uuidv4(),
-    ...request.body
-  }
-  console.log(insert)
-  prisma.merchant.create({
-    data: {}
-  })
   const merchant = await prisma.merchant.create({
     data: {
-      uid: uid,
       id: uuidv4(),
-      name: 'Coca Cola',
-      description: 'A company selling bottles',
-      siret: '1293848484747',
-      address_line: '20 rue des coquelicots',
-      address_line_2: '',
-      city: 'Paris',
-      state: 'Ile-de-france',
-      zip: '75011',
-      country: 'France'
+      ...request.body,
+      User: {
+        connect: {id: uid}
+      }
     }
   })
   return reply.code(200).send({
     data: merchant,
     message: messages.merchant.MERCHANT_ADDED
+  })
+}
+
+/**
+ * Edit an existing merchant
+ *
+ * @namespace Merchant
+ * @path {PUT} /merchant/:merchantId
+ * @code {200} if the request is successful
+ * @code {400} if email already exist
+ * @body {string} name
+ * @body {string} description
+ * @body {string} siret
+ * @body {string} address_line
+ * @body {string} address_line2
+ * @body {string} city
+ * @body {string} state
+ * @body {string} zip
+ * @body {string} country
+ */
+const editMerchantHandler = async (request: any, reply: FastifyReply) => {
+  const {uid} = request.auth
+  const {merchantId} = request.params
+  const merchant = await prisma.merchant.update({
+    where: {
+      uid_id: {
+        id: merchantId,
+        uid
+      }
+    },
+    data: {
+      ...request.body,
+      User: {
+        connect: {id: uid}
+      }
+    }
+  })
+  return reply.code(200).send({
+    data: merchant,
+    message: messages.merchant.MERCHANT_UPDATED
+  })
+}
+
+/**
+ * Delete an existing merchant
+ *
+ * @namespace Merchant
+ * @path {DELETE} /merchant/:merchantId
+ * @code {200} if the request is successful
+ * @code {400} if email already exist
+ * @body {string} name
+ * @body {string} description
+ * @body {string} siret
+ * @body {string} address_line
+ * @body {string} address_line2
+ * @body {string} city
+ * @body {string} state
+ * @body {string} zip
+ * @body {string} country
+ */
+const deleteMerchantHandler = async (request: any, reply: FastifyReply) => {
+  const {uid} = request.auth
+  const {merchantId} = request.params
+  const merchant = await prisma.merchant.delete({
+    where: {
+      uid_id: {
+        id: merchantId,
+        uid
+      }
+    }
+  })
+  return reply.code(200).send({
+    data: merchant,
+    message: messages.merchant.MERCHANT_DELETED
   })
 }
 
@@ -85,9 +151,51 @@ const addMerchant = {
   preHandler: authPreHandler
 }
 
+const editMerchant = {
+  schema: {
+    body: {
+      type: 'object',
+      properties: {
+        name: {type: 'string'},
+        description: {type: 'string'},
+        siret: {type: 'string'},
+        address_line: {type: 'string'},
+        address_line_2: {type: 'string'},
+        city: {type: 'string'},
+        state: {type: 'string'},
+        zip: {type: 'string'},
+        country: {type: 'string'}
+      }
+    },
+    params: {
+      type: 'object',
+      required: ['merchantId'],
+      properties: {
+        resetToken: {type: 'string', format: 'uuid'}
+      }
+    }
+  },
+  handler: editMerchantHandler,
+  preHandler: authPreHandler
+}
+
+const deleteMerchant = {
+  schema: {
+    params: {
+      type: 'object',
+      required: ['merchantId'],
+      properties: {
+        resetToken: {type: 'string', format: 'uuid'}
+      }
+    }
+  },
+  handler: deleteMerchantHandler,
+  preHandler: authPreHandler
+}
+
 // exported routes
 export const merchantRoutes = [
-  {method: 'POST', url: '/merchant', ...addMerchant}
-  // {method: 'PUT', url: '/merchant', ...editMerchant}
-  // {method: 'DELETE', url: '/merchant', ...addMerchant},
+  {method: 'POST', url: '/merchant', ...addMerchant},
+  {method: 'PUT', url: '/merchant/:merchantId', ...editMerchant},
+  {method: 'DELETE', url: '/merchant/:merchantId', ...deleteMerchant}
 ]

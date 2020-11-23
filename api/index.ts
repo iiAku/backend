@@ -8,18 +8,19 @@ import {merchantRoutes} from './src/merchant/routes'
 const routes = authRoutes.concat(merchantRoutes)
 
 export const PORT = 3000
-export const opts = {logger: true}
-export const build = (opts = {}) => {
-  const server = fastify(opts)
+export const options = {logger: true}
+export const build = (options = {}) => {
+  const server = fastify(options)
   server.register(fastifyCookie)
 
   for (const route of routes) {
     server.route(route)
   }
+
   return server
 }
 
-const serverInstance = build(opts)
+const serverInstance = build(options)
 
 serverInstance.listen(PORT, (err: any) => {
   if (err) {

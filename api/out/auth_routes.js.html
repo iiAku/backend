@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: routes.js</title>
+    <title>JSDoc: Source: auth/routes.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: routes.js</h1>
+    <h1 class="page-title">Source: auth/routes.js</h1>
 
     
 
@@ -28,55 +28,22 @@
         <article>
             <pre class="prettyprint source linenums"><code>"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.routes = exports.isUUID = void 0;
+exports.authRoutes = void 0;
 const Keyv = require("keyv");
 const bcrypt = require("bcrypt");
-const uuid_1 = require("uuid");
+const utils_1 = require("../utils");
 const client_1 = require("@prisma/client");
 const config_1 = require("../config");
 const messages_1 = require("../messages");
+const uuid_1 = require("uuid");
 const isDev = config_1.config.env === 'dev';
 const prisma = new client_1.PrismaClient();
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse });
-exports.isUUID = (uuid, uuidVersion) => uuid_1.validate(uuid) &amp;&amp; uuid_1.version(uuid) === uuidVersion;
-const emailExist = async (email) => {
-    const userWithEmail = await prisma.user.findOne({
-        where: {
-            email
-        }
-    });
-    if (userWithEmail !== null) {
-        return true;
-    }
-    return false;
-};
-const authPreHandler = async (request, reply, done) => {
-    if (!request.cookies ||
-        !(config_1.config.AUTH_COOKIE_NAME in request.cookies) ||
-        !exports.isUUID(request.cookies[config_1.config.AUTH_COOKIE_NAME], 4)) {
-        return reply.code(401).send({ message: messages_1.messages.auth.INVALID_COOKIE });
-    }
-    const { token } = request.cookies;
-    let auth = await keyv.get(token);
-    if (!auth) {
-        const userFromToken = await prisma.auth.findOne({
-            where: { token },
-            include: { User: true }
-        });
-        if (!userFromToken) {
-            return reply.code(403).send({ message: messages_1.messages.auth.EXPIRED_COOKIE });
-        }
-        auth = userFromToken;
-    }
-    await keyv.set(token, auth, 120 * 1000);
-    request.auth = auth;
-    done();
-};
 /**
  * Register a new user
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/register
  * @code {200} if the request is successful
  * @code {400} if email already exist
@@ -85,7 +52,7 @@ const authPreHandler = async (request, reply, done) => {
  */
 const registerHandler = async (request, reply) => {
     const { email, password } = request.body;
-    const isEmailExist = await emailExist(email);
+    const isEmailExist = await utils_1.emailExist(email);
     if (isEmailExist) {
         return reply.code(400).send({ message: messages_1.messages.auth.EMAIL_ALREADY_IN_USE });
     }
@@ -105,7 +72,7 @@ const registerHandler = async (request, reply) => {
 /**
  * Login a new user
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/login
  * @code {200} if the request is successful
  * @code {400} if email already exist
@@ -131,7 +98,7 @@ const loginHandler = async (request, reply) => {
     const token = uuid_1.v4();
     await prisma.auth.create({
         data: {
-            token,
+            id: token,
             ip: request.ip,
             User: {
                 connect: { id: user.id }
@@ -149,7 +116,7 @@ const loginHandler = async (request, reply) => {
 /**
  * Logout an authenticated user
  *
- * @name Auth
+ * @namespace Auth
  * @path {DELETE} /auth/logout
  * @code {200} if the request is successful
  * @auth This route requires a valid token cookie set in headers
@@ -158,14 +125,14 @@ const loginHandler = async (request, reply) => {
  * @code {500} if something went wrong
  */
 const logoutHandler = async (request, reply) => {
-    const { token } = request.auth;
-    await Promise.all([prisma.auth.delete({ where: { token } }), keyv.delete(token)]);
+    const { id } = request.auth;
+    await Promise.all([prisma.auth.delete({ where: { id } }), keyv.delete(id)]);
     reply.code(200).clearCookie(config_1.config.AUTH_COOKIE_NAME).send();
 };
 /**
  * Revoke all others auth tokens
  *
- * @name Auth
+ * @namespace Auth
  * @path {DELETE} /auth/logout-all
  * @code {200} if the request is successful
  * @auth This route requires a valid token cookie set in headers
@@ -174,16 +141,16 @@ const logoutHandler = async (request, reply) => {
  * @code {500} if something went wrong
  */
 const logoutAllHandler = async (request, reply) => {
-    const { token, id } = request.auth;
+    const { uid, id } = request.auth;
     await prisma.auth.deleteMany({
-        where: { id, NOT: { token } }
+        where: { uid, NOT: { id } }
     });
     reply.code(200).send();
 };
 /**
  * Forgot password (wip - experimental)
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/forgot-password
  * @code {400} if missing parameters
  * @code {401} if no existing user with email
@@ -214,28 +181,41 @@ const forgotPasswordHandler = async (request, reply) => {
         sendMail
     ]);
     console.log('resetToken', resetToken);
-    reply.code(200).send({ message: messages_1.messages.auth.GENERATE_TOKEN_SENT });
+    /*
+    NB - token is sent in data payload
+         for testing purpose (should not be exposed)
+         sent over email in prod
+    */
+    reply.code(200).send({
+        data: { resetToken },
+        message: messages_1.messages.auth.GENERATE_TOKEN_SENT
+    });
 };
 /**
  * Reset password (wip - experimental)
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/forgot-password
  * @code {400} if missing parameters
  * @code {401} if invalid reset token user with email
  * @code {200} if the request is successful
  */
 const resetPasswordHandler = async (request, reply) => {
-    const { token, newPassword } = request.body;
-    if (!token || !newPassword) {
+    const { newPassword } = request.body;
+    const { resetToken } = request.params;
+    if (!resetToken || !newPassword) {
         return reply.code(400).send();
     }
-    const forgotKey = `forgot:${token}`;
+    const forgotKey = `forgot:${resetToken}`;
     const isValidToken = await keyv.get(forgotKey);
+    if (!isValidToken) {
+        return reply
+            .code(401)
+            .send({ message: messages_1.messages.auth.INVALID_OR_EXPIRED_TOKEN });
+    }
     const emailKey = `forgot:${isValidToken.email}`;
     const lastIssuedToken = await keyv.get(emailKey);
-    console.log({ isValidToken, lastIssuedToken });
-    if (!isValidToken || lastIssuedToken !== token) {
+    if (lastIssuedToken !== resetToken) {
         return reply
             .code(401)
             .send({ message: messages_1.messages.auth.INVALID_OR_EXPIRED_TOKEN });
@@ -253,7 +233,7 @@ const resetPasswordHandler = async (request, reply) => {
 /**
  * Delete my account
  *
- * @name Auth
+ * @namespace Auth
  * @path {DELETE} /auth/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful
@@ -293,15 +273,15 @@ const login = {
 };
 const logout = {
     handler: logoutHandler,
-    preHandler: authPreHandler
+    preHandler: utils_1.authPreHandler
 };
 const logoutAll = {
     handler: logoutAllHandler,
-    preHandler: authPreHandler
+    preHandler: utils_1.authPreHandler
 };
 const deleteMe = {
     handler: deleteMeHandler,
-    preHandler: authPreHandler
+    preHandler: utils_1.authPreHandler
 };
 const forgotPassword = {
     schema: {
@@ -319,21 +299,27 @@ const resetPassword = {
     schema: {
         body: {
             type: 'object',
-            required: ['token', 'newPassword'],
+            required: ['newPassword'],
             properties: {
-                token: { type: 'string', format: 'uuid' },
                 newPassword: { type: 'string' }
+            }
+        },
+        params: {
+            type: 'object',
+            required: ['resetToken'],
+            properties: {
+                resetToken: { type: 'string', format: 'uuid' }
             }
         }
     },
     handler: resetPasswordHandler
 };
 // exported routes
-exports.routes = [
+exports.authRoutes = [
     { method: 'POST', url: '/auth/register', ...register },
     { method: 'POST', url: '/auth/login', ...login },
     { method: 'POST', url: '/auth/forgot-password', ...forgotPassword },
-    { method: 'POST', url: '/auth/reset-password', ...resetPassword },
+    { method: 'POST', url: '/auth/reset-password/:resetToken', ...resetPassword },
     { method: 'DELETE', url: '/auth/me', ...deleteMe },
     { method: 'DELETE', url: '/auth/logout', ...logout },
     { method: 'DELETE', url: '/auth/logout-all', ...logoutAll }
@@ -348,13 +334,13 @@ exports.routes = [
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html">Auth</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a></li><li><a href="Merchant.html">Merchant</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Nov 22 2020 15:35:15 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Nov 23 2020 02:17:11 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>

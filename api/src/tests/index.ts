@@ -1,13 +1,13 @@
 import * as p from 'phin'
 import * as test from 'ava'
 
-import {PORT, build, opts} from '../../index'
+import {PORT, build, opts} from '../..'
 
 import {isUUID} from '../auth/routes'
 import {messages} from '../messages'
 import {nanoid} from 'nanoid'
 
-// server.route({method: 'POST', url: '/register', ...register})
+// Server.route({method: 'POST', url: '/register', ...register})
 // server.route({method: 'DELETE', url: '/logout', ...logout})
 // server.route({method: 'DELETE', url: '/logout-others', ...logoutOthers})
 // server.route({method: 'POST', url: '/login', ...login})
@@ -86,14 +86,14 @@ test.serial('User registration email validation', async (t: any) => {
 })
 
 test.serial('Login with good user/pass then logout', async (t: any) => {
-  let reply = await p({
+  const reply = await p({
     url: `${t.context.prefixUrl}/login`,
     method: 'POST',
     data: t.context.user,
     parse: 'json'
   })
 
-  let {
+  const {
     body: {data, message}
   } = reply
 

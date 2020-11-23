@@ -17,7 +17,7 @@ const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 /**
  * Register a new user
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/register
  * @code {200} if the request is successful
  * @code {400} if email already exist
@@ -52,7 +52,7 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Login a new user
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/login
  * @code {200} if the request is successful
  * @code {400} if email already exist
@@ -95,10 +95,11 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
     message: messages.auth.LOGGED_IN
   })
 }
+
 /**
  * Logout an authenticated user
  *
- * @name Auth
+ * @namespace Auth
  * @path {DELETE} /auth/logout
  * @code {200} if the request is successful
  * @auth This route requires a valid token cookie set in headers
@@ -115,7 +116,7 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Revoke all others auth tokens
  *
- * @name Auth
+ * @namespace Auth
  * @path {DELETE} /auth/logout-all
  * @code {200} if the request is successful
  * @auth This route requires a valid token cookie set in headers
@@ -134,7 +135,7 @@ const logoutAllHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Forgot password (wip - experimental)
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/forgot-password
  * @code {400} if missing parameters
  * @code {401} if no existing user with email
@@ -190,7 +191,7 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Reset password (wip - experimental)
  *
- * @name Auth
+ * @namespace Auth
  * @path {POST} /auth/forgot-password
  * @code {400} if missing parameters
  * @code {401} if invalid reset token user with email
@@ -210,6 +211,7 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
       .code(401)
       .send({message: messages.auth.INVALID_OR_EXPIRED_TOKEN})
   }
+
   const emailKey = `forgot:${isValidToken.email}`
   const lastIssuedToken = await keyv.get(emailKey)
 
@@ -236,7 +238,7 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Delete my account
  *
- * @name Auth
+ * @namespace Auth
  * @path {DELETE} /auth/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful

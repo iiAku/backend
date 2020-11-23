@@ -26,11 +26,7 @@ export const emailExist = async (email: string) => {
   return false
 }
 
-export const authPreHandler = async (
-  request: any,
-  reply: FastifyReply,
-  done: any
-) => {
+export const authPreHandler = async (request: any, reply: FastifyReply) => {
   if (
     !request.cookies ||
     !(config.AUTH_COOKIE_NAME in request.cookies) ||
@@ -56,5 +52,4 @@ export const authPreHandler = async (
 
   await keyv.set(token, auth, 120 * 1000)
   request.auth = auth
-  done()
 }
