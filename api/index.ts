@@ -14,6 +14,7 @@ export const build = (options = {}) => {
   server.register(fastifyCookie)
 
   for (const route of routes) {
+    console.log(`${route.method} ${route.url}`)
     server.route(route)
   }
 

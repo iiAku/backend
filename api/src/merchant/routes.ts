@@ -13,12 +13,67 @@ const prisma = new PrismaClient()
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 /**
+ * Get a merchant from user
+ *
+ * @namespace Merchant
+ * @path {GET} /merchant/:merchantId
+ * @auth This route requires a valid token cookie set in headers
+ * @code {200} if the request is successful
+ * @code {401} if no cookies or malformed cookie
+ * @code {403} if expired cookie
+ * @code {500} if something went wrong
+ *
+ */
+const getMerchantHandler = async (request: any, reply: FastifyReply) => {
+  const {uid} = request.auth
+  const {merchantId} = request.params
+  const merchant = await prisma.merchant.findOne({
+    where: {
+      uid_id: {
+        id: merchantId,
+        uid
+      }
+    }
+  })
+  return reply.code(200).send({
+    data: merchant,
+    message: null
+  })
+}
+
+/**
+ * Get all merchant from user
+ *
+ * @namespace Merchant
+ * @path {GET} /merchant
+ * @auth This route requires a valid token cookie set in headers
+ * @code {200} if the request is successful
+ * @code {401} if no cookies or malformed cookie
+ * @code {403} if expired cookie
+ * @code {500} if something went wrong
+ *
+ */
+const getAllMerchantHandler = async (request: any, reply: FastifyReply) => {
+  const {uid} = request.auth
+  const merchants = await prisma.merchant.findMany({
+    where: {uid}
+  })
+  return reply.code(200).send({
+    data: merchants,
+    message: null
+  })
+}
+
+/**
  * Add a new merchant
  *
  * @namespace Merchant
  * @path {POST} /merchant
+ * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
- * @code {400} if email already exist
+ * @code {401} if no cookies or malformed cookie
+ * @code {403} if expired cookie
+ * @code {500} if something went wrong
  * @body {string} name
  * @body {string} description
  * @body {string} siret
@@ -51,8 +106,11 @@ const addMerchantHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Merchant
  * @path {PUT} /merchant/:merchantId
+ * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
- * @code {400} if email already exist
+ * @code {401} if no cookies or malformed cookie
+ * @code {403} if expired cookie
+ * @code {500} if something went wrong
  * @body {string} name
  * @body {string} description
  * @body {string} siret
@@ -91,8 +149,11 @@ const editMerchantHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Merchant
  * @path {DELETE} /merchant/:merchantId
+ * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
- * @code {400} if email already exist
+ * @code {401} if no cookies or malformed cookie
+ * @code {403} if expired cookie
+ * @code {500} if something went wrong
  * @body {string} name
  * @body {string} description
  * @body {string} siret
@@ -118,6 +179,25 @@ const deleteMerchantHandler = async (request: any, reply: FastifyReply) => {
     data: merchant,
     message: messages.merchant.MERCHANT_DELETED
   })
+}
+
+const getMerchant = {
+  handler: getMerchantHandler,
+  schema: {
+    params: {
+      type: 'object',
+      required: ['merchantId'],
+      properties: {
+        resetToken: {type: 'string', format: 'uuid'}
+      }
+    }
+  },
+  preHandler: authPreHandler
+}
+
+const getAllMerchants = {
+  handler: getAllMerchantHandler,
+  preHandler: authPreHandler
 }
 
 const addMerchant = {
@@ -195,6 +275,8 @@ const deleteMerchant = {
 
 // exported routes
 export const merchantRoutes = [
+  {method: 'GET', url: '/merchant', ...getAllMerchants},
+  {method: 'GET', url: '/merchant/:merchantId', ...getMerchant},
   {method: 'POST', url: '/merchant', ...addMerchant},
   {method: 'PUT', url: '/merchant/:merchantId', ...editMerchant},
   {method: 'DELETE', url: '/merchant/:merchantId', ...deleteMerchant}
