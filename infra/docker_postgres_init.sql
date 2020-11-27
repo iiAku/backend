@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS "public"."Auth";
+DROP TABLE IF EXISTS "public"."Merchant";
+DROP TABLE IF EXISTS "public"."User";
+
 CREATE TABLE "public"."User" (
   "id" uuid PRIMARY KEY NOT NULL,
   "email" VARCHAR(255) UNIQUE NOT NULL,

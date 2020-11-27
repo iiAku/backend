@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "postinstall": "tsc && mv -i -v public dist/ && rm -v -rf src",
+    "postinstall": "tsc && mv -i -v public dist/  && cat infra/docker_postgres_init.sql | heroku pg:psql -a dev-bob-api",
     "dev": "nodemon dist/index.js",
     "watch": "tsc -w"
   },
