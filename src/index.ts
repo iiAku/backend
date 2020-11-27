@@ -9,6 +9,7 @@ import { merchantRoutes } from "./merchant/routes"
 const routes: RouteOptions[] = authRoutes.concat(merchantRoutes)
 
 export const PORT = process.env.PORT || 3000
+export const HOST = process.env.PORT ? "0.0.0.0" : "127.0.0.1"
 export const options = { logger: true }
 export const build = (options = {}) => {
   const server = fastify(options)
@@ -23,7 +24,7 @@ export const build = (options = {}) => {
 
 const serverInstance = build(options)
 
-serverInstance.listen(PORT, (err: any) => {
+serverInstance.listen(PORT, HOST, (err: any) => {
   if (err) {
     serverInstance.log.error(err)
     throw new Error("something went wrong")
