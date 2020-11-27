@@ -1,0 +1,42 @@
+{
+  "name": "bob-api",
+  "version": "0.0.1",
+  "engines": {
+    "node": "12.x"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "postinstall": "tsc && mv -i -v public dist/ && rm -v -rf src",
+    "dev": "nodemon dist/index.js",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@prisma/cli": "^2.11.0",
+    "@prisma/client": "^2.11.0",
+    "@types/bcrypt": "^3.0.0",
+    "@types/keyv": "^3.1.1",
+    "@types/node": "^14.11.10",
+    "@types/uuid": "^8.3.0",
+    "bcrypt": "^5.0.0",
+    "fastify": "^3.7.0",
+    "fastify-cookie": "^4.1.0",
+    "fs": "^0.0.1-security",
+    "keyv": "^4.0.3",
+    "nanoid": "^3.1.16",
+    "phin": "^3.5.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "ava": "^3.13.0",
+    "jsdoc": "^3.6.6",
+    "jsdoc-http-plugin": "^0.3.2",
+    "xo": "^0.35.0"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "fastify"
+  ],
+  "license": "MIT"
+}
