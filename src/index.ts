@@ -8,7 +8,7 @@ import { merchantRoutes } from "./merchant/routes"
 
 const routes: RouteOptions[] = authRoutes.concat(merchantRoutes)
 
-export const PORT = 3000
+export const PORT = process.env.PORT || 3000
 export const options = { logger: true }
 export const build = (options = {}) => {
   const server = fastify(options)
