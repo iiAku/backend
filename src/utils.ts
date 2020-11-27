@@ -14,7 +14,7 @@ export const isUUID = (uuid: string, uuidVersion: number) =>
   validate(uuid) && version(uuid) === uuidVersion
 
 export const emailExist = async (email: string) => {
-  const userWithEmail = await prisma.user.findOne({
+  const userWithEmail = await prisma.user.findUnique({
     where: {
       email
     }
@@ -39,7 +39,7 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
   let auth = await keyv.get(token)
 
   if (!auth) {
-    const userFromToken = await prisma.auth.findOne({
+    const userFromToken = await prisma.auth.findUnique({
       where: {id: token},
       include: {User: true}
     })

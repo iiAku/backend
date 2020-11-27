@@ -61,7 +61,7 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
  */
 const loginHandler = async (request: any, reply: FastifyReply) => {
   const {email, password} = request.body
-  const user = await prisma.user.findOne({
+  const user = await prisma.user.findUnique({
     where: {email}
   })
   if (!user) {
@@ -147,7 +147,7 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
     return reply.code(400).send()
   }
 
-  const userFromEmail = await prisma.user.findOne({where: {email}})
+  const userFromEmail = await prisma.user.findUnique({where: {email}})
   if (userFromEmail === null) {
     return reply.code(401).send()
   }

@@ -27,7 +27,7 @@ const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 const getMerchantHandler = async (request: any, reply: FastifyReply) => {
   const {uid} = request.auth
   const {merchantId} = request.params
-  const merchant = await prisma.merchant.findOne({
+  const merchant = await prisma.merchant.findUnique({
     where: {
       uid_id: {
         id: merchantId,
