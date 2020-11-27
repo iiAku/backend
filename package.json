@@ -7,9 +7,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "postinstall": "tsc && mv -i -v public dist/  && cat infra/docker_postgres_init.sql | heroku pg:psql -a dev-bob-api",
+    "postinstall": "tsc && mv -i -v public dist/ && rm -v -rf src",
     "dev": "nodemon dist/index.js",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "prisma-introspect": "npx prisma introspect --force",
+    "prisma-generate": "npx prisma generate",
+    "database-drop": "cat infra/docker_postgres_init.sql | heroku pg:psql -a dev-bob-api"
   },
   "dependencies": {
     "@prisma/cli": "^2.11.0",

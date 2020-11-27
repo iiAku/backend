@@ -1,16 +1,16 @@
-import fastify, { FastifyInstance } from "fastify"
+import fastify, {FastifyInstance} from 'fastify'
 
-import { AddressInfo } from "net"
-import { RouteOptions } from "fastify/types/route"
-import { authRoutes } from "./auth/routes"
-import fastifyCookie from "fastify-cookie"
-import { merchantRoutes } from "./merchant/routes"
+import {AddressInfo} from 'net'
+import {RouteOptions} from 'fastify/types/route'
+import {authRoutes} from './auth/routes'
+import fastifyCookie from 'fastify-cookie'
+import {merchantRoutes} from './merchant/routes'
 
 const routes: RouteOptions[] = authRoutes.concat(merchantRoutes)
 
 export const PORT = process.env.PORT || 3000
-export const HOST = process.env.PORT ? "0.0.0.0" : "127.0.0.1"
-export const options = { logger: true }
+export const HOST = process.env.PORT ? '0.0.0.0' : '127.0.0.1'
+export const options = {logger: true}
 export const build = (options = {}) => {
   const server = fastify(options)
   server.register(fastifyCookie)
@@ -27,9 +27,9 @@ const serverInstance = build(options)
 serverInstance.listen(PORT, HOST, (err: any) => {
   if (err) {
     serverInstance.log.error(err)
-    throw new Error("something went wrong")
+    throw new Error('something went wrong')
   }
 
-  const { port } = serverInstance.server.address() as AddressInfo
+  const {port} = serverInstance.server.address() as AddressInfo
   serverInstance.log.info(`server listening on ${port}`)
 })
