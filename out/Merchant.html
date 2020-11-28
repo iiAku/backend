@@ -41,78 +41,13 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">POST</td>
-                            <td class="name last">/merchant</td>
+                            <td class="type">GET</td>
+                            <td class="name last">/merchant/:merchantId</td>
                             </tr>
                             </table>
-                            <p>Add a new merchant</p>
-                            <h5>Body Parameters:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            <td class="name">name</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">description</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">siret</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">address_line</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">address_line2</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">city</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">state</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">zip</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">country</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr>
-          </table>
+                            <p>Get a merchant from user
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
                             <h5>Response Code:</h5>
           <table class="params">
             <thead>
@@ -132,10 +67,22 @@
             <td class="description last">if the request is successful</td>
           </tr><tr>
             
-            <td class="type">400</td>
+            <td class="type">401</td>
             
             
-            <td class="description last">if email already exist</td>
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
           </tr>
           </table></div>
         
@@ -234,11 +181,153 @@
                             <table class="params">
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
-                            <td class="type">PUT</td>
-                            <td class="name last">/merchant/:merchantId</td>
+                            <td class="type">GET</td>
+                            <td class="name last">/merchant</td>
                             </tr>
                             </table>
-                            <p>Edit an existing merchant</p>
+                            <p>Get all merchant from user
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="merchant_routes.js.html">merchant/routes.js</a>, <a href="merchant_routes.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">POST</td>
+                            <td class="name last">/merchant</td>
+                            </tr>
+                            </table>
+                            <p>Add a new merchant
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
                             <h5>Body Parameters:</h5>
           <table class="params">
             <thead>
@@ -325,10 +414,22 @@
             <td class="description last">if the request is successful</td>
           </tr><tr>
             
-            <td class="type">400</td>
+            <td class="type">401</td>
             
             
-            <td class="description last">if email already exist</td>
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
           </tr>
           </table></div>
         
@@ -365,7 +466,214 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="merchant_routes.js.html">merchant/routes.js</a>, <a href="merchant_routes.js.html#line47">line 47</a>
+        <a href="merchant_routes.js.html">merchant/routes.js</a>, <a href="merchant_routes.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">PUT</td>
+                            <td class="name last">/merchant/:merchantId</td>
+                            </tr>
+                            </table>
+                            <p>Edit an existing merchant
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Body Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">name</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">description</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">siret</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line2</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">city</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">state</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">zip</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">country</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="merchant_routes.js.html">merchant/routes.js</a>, <a href="merchant_routes.js.html#line100">line 100</a>
     </li></ul></dd>
     
 
@@ -431,7 +739,9 @@
                             <td class="name last">/merchant/:merchantId</td>
                             </tr>
                             </table>
-                            <p>Edit an existing merchant</p>
+                            <p>Delete an existing merchant
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
                             <h5>Body Parameters:</h5>
           <table class="params">
             <thead>
@@ -518,10 +828,22 @@
             <td class="description last">if the request is successful</td>
           </tr><tr>
             
-            <td class="type">400</td>
+            <td class="type">401</td>
             
             
-            <td class="description last">if email already exist</td>
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
           </tr>
           </table></div>
         
@@ -558,7 +880,908 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="merchant_routes.js.html">merchant/routes.js</a>, <a href="merchant_routes.js.html#line86">line 86</a>
+        <a href="merchant_routes.js.html">merchant/routes.js</a>, <a href="merchant_routes.js.html#line142">line 142</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">GET</td>
+                            <td class="name last">/merchant/:merchantId</td>
+                            </tr>
+                            </table>
+                            <p>Get a merchant from user
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_merchant_routes.js.html">src/merchant/routes.js</a>, <a href="src_merchant_routes.js.html#line14">line 14</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">GET</td>
+                            <td class="name last">/merchant</td>
+                            </tr>
+                            </table>
+                            <p>Get all merchant from user
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_merchant_routes.js.html">src/merchant/routes.js</a>, <a href="src_merchant_routes.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">POST</td>
+                            <td class="name last">/merchant</td>
+                            </tr>
+                            </table>
+                            <p>Add a new merchant
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Body Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">name</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">description</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">siret</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line2</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">city</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">state</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">zip</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">country</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_merchant_routes.js.html">src/merchant/routes.js</a>, <a href="src_merchant_routes.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">PUT</td>
+                            <td class="name last">/merchant/:merchantId</td>
+                            </tr>
+                            </table>
+                            <p>Edit an existing merchant
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Body Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">name</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">description</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">siret</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line2</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">city</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">state</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">zip</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">country</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_merchant_routes.js.html">src/merchant/routes.js</a>, <a href="src_merchant_routes.js.html#line100">line 100</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>Merchant</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">DELETE</td>
+                            <td class="name last">/merchant/:merchantId</td>
+                            </tr>
+                            </table>
+                            <p>Delete an existing merchant
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Body Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">name</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">description</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">siret</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">address_line2</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">city</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">state</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">zip</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr><tr>
+            <td class="name">country</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_merchant_routes.js.html">src/merchant/routes.js</a>, <a href="src_merchant_routes.js.html#line142">line 142</a>
     </li></ul></dd>
     
 
@@ -603,13 +1826,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a></li><li><a href="Merchant.html">Merchant</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a></li><li><a href="Merchant.html">Merchant</a></li><li><a href="Organization.html">Organization</a></li><li><a href="Shop.html">Shop</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Nov 23 2020 02:17:11 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sat Nov 28 2020 01:08:14 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>

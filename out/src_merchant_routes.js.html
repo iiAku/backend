@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: merchant/routes.js</title>
+    <title>JSDoc: Source: src/merchant/routes.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: merchant/routes.js</h1>
+    <h1 class="page-title">Source: src/merchant/routes.js</h1>
 
     
 
@@ -35,7 +35,7 @@ const utils_1 = require("../utils");
 const config_1 = require("../config");
 const messages_1 = require("../messages");
 const uuid_1 = require("uuid");
-const isDev = config_1.config.env === 'dev';
+const isDev = config_1.config.env === "dev";
 const prisma = new client_1.PrismaClient();
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse });
@@ -58,13 +58,13 @@ const getMerchantHandler = async (request, reply) => {
         where: {
             uid_id: {
                 id: merchantId,
-                uid
-            }
-        }
+                uid,
+            },
+        },
     });
     return reply.code(200).send({
         data: merchant,
-        message: null
+        message: null,
     });
 };
 /**
@@ -82,11 +82,11 @@ const getMerchantHandler = async (request, reply) => {
 const getAllMerchantHandler = async (request, reply) => {
     const { uid } = request.auth;
     const merchants = await prisma.merchant.findMany({
-        where: { uid }
+        where: { uid },
     });
     return reply.code(200).send({
         data: merchants,
-        message: null
+        message: null,
     });
 };
 /**
@@ -116,13 +116,13 @@ const addMerchantHandler = async (request, reply) => {
             id: uuid_1.v4(),
             ...request.body,
             User: {
-                connect: { id: uid }
-            }
-        }
+                connect: { id: uid },
+            },
+        },
     });
     return reply.code(200).send({
         data: merchant,
-        message: messages_1.messages.merchant.MERCHANT_ADDED
+        message: messages_1.messages.merchant.MERCHANT_ADDED,
     });
 };
 /**
@@ -152,19 +152,19 @@ const editMerchantHandler = async (request, reply) => {
         where: {
             uid_id: {
                 id: merchantId,
-                uid
-            }
+                uid,
+            },
         },
         data: {
             ...request.body,
             User: {
-                connect: { id: uid }
-            }
-        }
+                connect: { id: uid },
+            },
+        },
     });
     return reply.code(200).send({
         data: merchant,
-        message: messages_1.messages.merchant.MERCHANT_UPDATED
+        message: messages_1.messages.merchant.MERCHANT_UPDATED,
     });
 };
 /**
@@ -194,109 +194,109 @@ const deleteMerchantHandler = async (request, reply) => {
         where: {
             uid_id: {
                 id: merchantId,
-                uid
-            }
-        }
+                uid,
+            },
+        },
     });
     return reply.code(200).send({
         data: merchant,
-        message: messages_1.messages.merchant.MERCHANT_DELETED
+        message: messages_1.messages.merchant.MERCHANT_DELETED,
     });
 };
 const getMerchant = {
     handler: getMerchantHandler,
     schema: {
         params: {
-            type: 'object',
-            required: ['merchantId'],
+            type: "object",
+            required: ["merchantId"],
             properties: {
-                resetToken: { type: 'string', format: 'uuid' }
-            }
-        }
+                resetToken: { type: "string", format: "uuid" },
+            },
+        },
     },
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const getAllMerchants = {
     handler: getAllMerchantHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const addMerchant = {
     schema: {
         body: {
-            type: 'object',
+            type: "object",
             required: [
-                'name',
-                'description',
-                'siret',
-                'address_line',
-                'city',
-                'state',
-                'zip',
-                'country'
+                "name",
+                "description",
+                "siret",
+                "address_line",
+                "city",
+                "state",
+                "zip",
+                "country",
             ],
             properties: {
-                name: { type: 'string' },
-                description: { type: 'string' },
-                siret: { type: 'string' },
-                address_line: { type: 'string' },
-                address_line_2: { type: 'string' },
-                city: { type: 'string' },
-                state: { type: 'string' },
-                zip: { type: 'string' },
-                country: { type: 'string' }
-            }
-        }
+                name: { type: "string" },
+                description: { type: "string" },
+                siret: { type: "string" },
+                address_line: { type: "string" },
+                address_line_2: { type: "string" },
+                city: { type: "string" },
+                state: { type: "string" },
+                zip: { type: "string" },
+                country: { type: "string" },
+            },
+        },
     },
     handler: addMerchantHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const editMerchant = {
     schema: {
         body: {
-            type: 'object',
+            type: "object",
             properties: {
-                name: { type: 'string' },
-                description: { type: 'string' },
-                siret: { type: 'string' },
-                address_line: { type: 'string' },
-                address_line_2: { type: 'string' },
-                city: { type: 'string' },
-                state: { type: 'string' },
-                zip: { type: 'string' },
-                country: { type: 'string' }
-            }
+                name: { type: "string" },
+                description: { type: "string" },
+                siret: { type: "string" },
+                address_line: { type: "string" },
+                address_line_2: { type: "string" },
+                city: { type: "string" },
+                state: { type: "string" },
+                zip: { type: "string" },
+                country: { type: "string" },
+            },
         },
         params: {
-            type: 'object',
-            required: ['merchantId'],
+            type: "object",
+            required: ["merchantId"],
             properties: {
-                resetToken: { type: 'string', format: 'uuid' }
-            }
-        }
+                resetToken: { type: "string", format: "uuid" },
+            },
+        },
     },
     handler: editMerchantHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const deleteMerchant = {
     schema: {
         params: {
-            type: 'object',
-            required: ['merchantId'],
+            type: "object",
+            required: ["merchantId"],
             properties: {
-                resetToken: { type: 'string', format: 'uuid' }
-            }
-        }
+                resetToken: { type: "string", format: "uuid" },
+            },
+        },
     },
     handler: deleteMerchantHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 // exported routes
 exports.merchantRoutes = [
-    { method: 'GET', url: '/merchant', ...getAllMerchants },
-    { method: 'GET', url: '/merchant/:merchantId', ...getMerchant },
-    { method: 'POST', url: '/merchant', ...addMerchant },
-    { method: 'PUT', url: '/merchant/:merchantId', ...editMerchant },
-    { method: 'DELETE', url: '/merchant/:merchantId', ...deleteMerchant }
+    { method: "GET", url: "/merchant", ...getAllMerchants },
+    { method: "GET", url: "/merchant/:merchantId", ...getMerchant },
+    { method: "POST", url: "/merchant", ...addMerchant },
+    { method: "PUT", url: "/merchant/:merchantId", ...editMerchant },
+    { method: "DELETE", url: "/merchant/:merchantId", ...deleteMerchant },
 ];
 </code></pre>
         </article>

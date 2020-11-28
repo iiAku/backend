@@ -8,19 +8,28 @@ datasource db {
 }
 
 model Auth {
-  uid       String
-  id        String   @unique
-  ip        String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  User      User     @relation(fields: [uid], references: [id])
+  id           String       @unique
+  oid          String
+  ip           String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now())
+  Organization Organization @relation(fields: [oid], references: [id])
 
-  @@id([uid, id])
+  @@id([id, oid])
 }
 
-model Merchant {
-  uid           String
-  id            String  @unique
+model Organization {
+  id        String   @id
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  Auth      Auth[]
+  Shop      Shop[]
+}
+
+model Shop {
+  oid           String
+  id            String       @unique
   name          String
   description   String?
   siret         String
@@ -30,16 +39,7 @@ model Merchant {
   state         String
   zip           String
   country       String
-  User          User    @relation(fields: [uid], references: [id])
+  Organization  Organization @relation(fields: [oid], references: [id])
 
-  @@id([uid, id])
-}
-
-model User {
-  id        String     @id
-  email     String     @unique
-  password  String
-  createdAt DateTime   @default(now())
-  Auth      Auth[]
-  Merchant  Merchant[]
+  @@id([id, oid])
 }

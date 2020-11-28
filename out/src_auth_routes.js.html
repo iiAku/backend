@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: auth/routes.js</title>
+    <title>JSDoc: Source: src/auth/routes.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: auth/routes.js</h1>
+    <h1 class="page-title">Source: src/auth/routes.js</h1>
 
     
 
@@ -36,7 +36,7 @@ const client_1 = require("@prisma/client");
 const config_1 = require("../config");
 const messages_1 = require("../messages");
 const uuid_1 = require("uuid");
-const isDev = config_1.config.env === 'dev';
+const isDev = config_1.config.env === "dev";
 const prisma = new client_1.PrismaClient();
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse });
@@ -61,12 +61,12 @@ const registerHandler = async (request, reply) => {
         data: {
             id: uuid_1.v4(),
             email,
-            password: hashedPassword
-        }
+            password: hashedPassword,
+        },
     });
     return reply.code(200).send({
         data: { user },
-        message: messages_1.messages.auth.REGISTERED
+        message: messages_1.messages.auth.REGISTERED,
     });
 };
 /**
@@ -82,17 +82,17 @@ const registerHandler = async (request, reply) => {
 const loginHandler = async (request, reply) => {
     const { email, password } = request.body;
     const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
     });
     if (!user) {
         return reply.code(401).send({
-            message: messages_1.messages.auth.INVALID_CREDENTIALS
+            message: messages_1.messages.auth.INVALID_CREDENTIALS,
         });
     }
     const compare = await bcrypt.compare(password, user.password);
     if (!compare) {
         return reply.code(401).send({
-            message: messages_1.messages.auth.INVALID_CREDENTIALS
+            message: messages_1.messages.auth.INVALID_CREDENTIALS,
         });
     }
     const token = uuid_1.v4();
@@ -101,16 +101,16 @@ const loginHandler = async (request, reply) => {
             id: token,
             ip: request.ip,
             User: {
-                connect: { id: user.id }
-            }
-        }
+                connect: { id: user.id },
+            },
+        },
     });
     return reply.setCookie(config_1.config.AUTH_COOKIE_NAME, token).send({
         data: {
             session_token: token,
-            ...user
+            ...user,
         },
-        message: messages_1.messages.auth.LOGGED_IN
+        message: messages_1.messages.auth.LOGGED_IN,
     });
 };
 /**
@@ -143,7 +143,7 @@ const logoutHandler = async (request, reply) => {
 const logoutAllHandler = async (request, reply) => {
     const { uid, id } = request.auth;
     await prisma.auth.deleteMany({
-        where: { uid, NOT: { id } }
+        where: { uid, NOT: { id } },
     });
     reply.code(200).send();
 };
@@ -170,7 +170,7 @@ const forgotPasswordHandler = async (request, reply) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 // Send email to user
-                console.log('Email sent');
+                console.log("Email sent");
                 resolve();
             }, 500);
         });
@@ -178,9 +178,9 @@ const forgotPasswordHandler = async (request, reply) => {
     await Promise.all([
         await keyv.set(`forgot:${email}`, resetToken, isDev ? 300 * 1000 : config_1.config.FORGOT_PASSWORD_EXPIRY_SEC),
         await keyv.set(`forgot:${resetToken}`, userFromEmail, isDev ? 300 * 1000 : config_1.config.FORGOT_PASSWORD_EXPIRY_SEC),
-        sendMail
+        sendMail,
     ]);
-    console.log('resetToken', resetToken);
+    console.log("resetToken", resetToken);
     /*
     NB - token is sent in data payload
          for testing purpose (should not be exposed)
@@ -188,7 +188,7 @@ const forgotPasswordHandler = async (request, reply) => {
     */
     reply.code(200).send({
         data: { resetToken },
-        message: messages_1.messages.auth.GENERATE_TOKEN_SENT
+        message: messages_1.messages.auth.GENERATE_TOKEN_SENT,
     });
 };
 /**
@@ -224,11 +224,13 @@ const resetPasswordHandler = async (request, reply) => {
     const updatePassword = prisma.user.update({
         where: { id: isValidToken.id },
         data: {
-            password: hashedNewPassword
-        }
+            password: hashedNewPassword,
+        },
     });
     await Promise.all([updatePassword, keyv.delete(forgotKey)]);
-    return reply.code(200).send({ message: messages_1.messages.auth.RESET_PASSWORD_SUCCEEDED });
+    return reply
+        .code(200)
+        .send({ message: messages_1.messages.auth.RESET_PASSWORD_SUCCEEDED });
 };
 /**
  * Delete my account
@@ -257,72 +259,72 @@ const deleteMeHandler = async (request, reply) => {
 const register = {
     schema: {
         body: {
-            type: 'object',
-            required: ['email', 'password'],
+            type: "object",
+            required: ["email", "password"],
             properties: {
-                email: { type: 'string', format: 'email' },
-                password: { type: 'string' }
-            }
-        }
+                email: { type: "string", format: "email" },
+                password: { type: "string" },
+            },
+        },
     },
-    handler: registerHandler
+    handler: registerHandler,
 };
 const login = {
     schema: register.schema,
-    handler: loginHandler
+    handler: loginHandler,
 };
 const logout = {
     handler: logoutHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const logoutAll = {
     handler: logoutAllHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const deleteMe = {
     handler: deleteMeHandler,
-    preHandler: utils_1.authPreHandler
+    preHandler: utils_1.authPreHandler,
 };
 const forgotPassword = {
     schema: {
         body: {
-            type: 'object',
-            required: ['email'],
+            type: "object",
+            required: ["email"],
             properties: {
-                email: { type: 'string', format: 'email' }
-            }
-        }
+                email: { type: "string", format: "email" },
+            },
+        },
     },
-    handler: forgotPasswordHandler
+    handler: forgotPasswordHandler,
 };
 const resetPassword = {
     schema: {
         body: {
-            type: 'object',
-            required: ['newPassword'],
+            type: "object",
+            required: ["newPassword"],
             properties: {
-                newPassword: { type: 'string' }
-            }
+                newPassword: { type: "string" },
+            },
         },
         params: {
-            type: 'object',
-            required: ['resetToken'],
+            type: "object",
+            required: ["resetToken"],
             properties: {
-                resetToken: { type: 'string', format: 'uuid' }
-            }
-        }
+                resetToken: { type: "string", format: "uuid" },
+            },
+        },
     },
-    handler: resetPasswordHandler
+    handler: resetPasswordHandler,
 };
 // exported routes
 exports.authRoutes = [
-    { method: 'POST', url: '/auth/register', ...register },
-    { method: 'POST', url: '/auth/login', ...login },
-    { method: 'POST', url: '/auth/forgot-password', ...forgotPassword },
-    { method: 'POST', url: '/auth/reset-password/:resetToken', ...resetPassword },
-    { method: 'DELETE', url: '/auth/me', ...deleteMe },
-    { method: 'DELETE', url: '/auth/logout', ...logout },
-    { method: 'DELETE', url: '/auth/logout-all', ...logoutAll }
+    { method: "POST", url: "/auth/register", ...register },
+    { method: "POST", url: "/auth/login", ...login },
+    { method: "POST", url: "/auth/forgot-password", ...forgotPassword },
+    { method: "POST", url: "/auth/reset-password/:resetToken", ...resetPassword },
+    { method: "DELETE", url: "/auth/me", ...deleteMe },
+    { method: "DELETE", url: "/auth/logout", ...logout },
+    { method: "DELETE", url: "/auth/logout-all", ...logoutAll },
 ];
 </code></pre>
         </article>
