@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "postinstall": "tsc && mv -i -v public dist/ && rm -v -rf src",
+    "postinstall": "tsc && node postinstall.js",
     "dev": "nodemon dist/index.js",
     "doc": "rm -rf documentation/ && ./node_modules/.bin/jsdoc -c jsdoc.conf -d documentation",
     "watch": "rm -rf dist/ && tsc -w",
@@ -25,6 +25,7 @@
     "bcrypt": "^5.0.0",
     "fastify": "^3.7.0",
     "fastify-cookie": "^4.1.0",
+    "fastify-cors": "^5.0.0",
     "fs": "^0.0.1-security",
     "keyv": "^4.0.3",
     "nanoid": "^3.1.16",
