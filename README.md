@@ -14,9 +14,15 @@
 
 ### 🏠 [Homepage](https://github.com/Bob-france/backend)
 
-## Prerequisites
+## Prerequisites for local testing
 
-- node 12.x
+- docker
+- docker-compose (https://docs.docker.com/compose/install/)
+- node 12.x (https://nodejs.org/en/)
+
+## Live API
+
+endpoint: https://dev-bob-api.herokuapp.com
 
 ## Install
 
@@ -43,6 +49,7 @@ Make sure everything is running with docker ps/docker ps -a
 Your app should be automatically wired to above resources
 
 Build and watch for changes with `yarn run watch`
+
 Run dev with `yarn run dev`
 
 See scripts from `package.json` file for scripts
