@@ -17,13 +17,13 @@ if (process.env.NODE_ENV === 'production') {
 
   for (const dir of dirs) {
     const element = path.join(parent, dir)
-    if (isDirectory(element) && !keep.has(dir)) {
+    if (isDirectory(element) && !keep.includes(dir)) {
       console.log('removing dir', element)
       fs.rmdirSync(element, {recursive: true})
       continue
     }
 
-    if (isFile(element) && !keep.has(dir)) {
+    if (isFile(element) && !keep.includes(dir)) {
       console.log('removing file', element)
       fs.unlinkSync(element)
       continue
