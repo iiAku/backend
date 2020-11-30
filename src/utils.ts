@@ -1,6 +1,6 @@
 import * as Keyv from 'keyv'
 
-import {v4 as uuidv4, validate, version} from 'uuid'
+import {validate, version} from 'uuid'
 
 import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
@@ -14,7 +14,7 @@ export const isUUID = (uuid: string, uuidVersion: number) =>
   validate(uuid) && version(uuid) === uuidVersion
 
 export const emailExist = async (email: string) => {
-  const userWithEmail = await prisma.user.findUnique({
+  const userWithEmail = await prisma.organization.findUnique({
     where: {
       email
     }
@@ -41,7 +41,7 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
   if (!auth) {
     const userFromToken = await prisma.auth.findUnique({
       where: {id: token},
-      include: {User: true}
+      include: {Organization: true}
     })
     if (!userFromToken) {
       return reply.code(403).send({message: messages.auth.EXPIRED_COOKIE})

@@ -14,10 +14,10 @@ const prisma = new PrismaClient()
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 /**
- * Get a merchant from user
+ * Get a shop from user
  *
- * @namespace Merchant
- * @path {GET} /merchant/:merchantId
+ * @namespace Shop
+ * @path {GET} /shop/:shopId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -25,28 +25,28 @@ const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
  * @code {500} if something went wrong
  *
  */
-const getMerchantHandler = async (request: any, reply: FastifyReply) => {
-  const {uid} = request.auth
-  const {merchantId} = request.params
-  const merchant = await prisma.merchant.findUnique({
+const getShopHandler = async (request: any, reply: FastifyReply) => {
+  const {oid} = request.auth
+  const {shopId} = request.params
+  const shop = await prisma.shop.findUnique({
     where: {
-      uid_id: {
-        id: merchantId,
-        uid
+      id_oid: {
+        id: shopId,
+        oid
       }
     }
   })
   return reply.code(200).send({
-    data: merchant,
+    data: shop,
     message: null
   })
 }
 
 /**
- * Get all merchant from user
+ * Get all shop from user
  *
- * @namespace Merchant
- * @path {GET} /merchant
+ * @namespace Shop
+ * @path {GET} /shop
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -54,22 +54,22 @@ const getMerchantHandler = async (request: any, reply: FastifyReply) => {
  * @code {500} if something went wrong
  *
  */
-const getAllMerchantHandler = async (request: any, reply: FastifyReply) => {
-  const {uid} = request.auth
-  const merchants = await prisma.merchant.findMany({
-    where: {uid}
+const getAllShopHandler = async (request: any, reply: FastifyReply) => {
+  const {oid} = request.auth
+  const shops = await prisma.shop.findMany({
+    where: {oid}
   })
   return reply.code(200).send({
-    data: merchants,
+    data: shops,
     message: null
   })
 }
 
 /**
- * Add a new merchant
+ * Add a new shop
  *
- * @namespace Merchant
- * @path {POST} /merchant
+ * @namespace Shop
+ * @path {POST} /shop
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -85,28 +85,28 @@ const getAllMerchantHandler = async (request: any, reply: FastifyReply) => {
  * @body {string} zip
  * @body {string} country
  */
-const addMerchantHandler = async (request: any, reply: FastifyReply) => {
-  const {uid} = request.auth
-  const merchant = await prisma.merchant.create({
+const addShopHandler = async (request: any, reply: FastifyReply) => {
+  const {oid} = request.auth
+  const shop = await prisma.shop.create({
     data: {
       id: uuidv4(),
       ...request.body,
-      User: {
-        connect: {id: uid}
+      Organization: {
+        connect: {id: oid}
       }
     }
   })
   return reply.code(200).send({
-    data: merchant,
-    message: messages.merchant.MERCHANT_ADDED
+    data: shop,
+    message: messages.shop.SHOP_ADDED
   })
 }
 
 /**
- * Edit an existing merchant
+ * Edit an existing shop
  *
- * @namespace Merchant
- * @path {PUT} /merchant/:merchantId
+ * @namespace Shop
+ * @path {PUT} /shop/:shopId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -122,34 +122,34 @@ const addMerchantHandler = async (request: any, reply: FastifyReply) => {
  * @body {string} zip
  * @body {string} country
  */
-const editMerchantHandler = async (request: any, reply: FastifyReply) => {
-  const {uid} = request.auth
-  const {merchantId} = request.params
-  const merchant = await prisma.merchant.update({
+const editShopHandler = async (request: any, reply: FastifyReply) => {
+  const {oid} = request.auth
+  const {shopId} = request.params
+  const shop = await prisma.shop.update({
     where: {
-      uid_id: {
-        id: merchantId,
-        uid
+      id_oid: {
+        id: shopId,
+        oid
       }
     },
     data: {
       ...request.body,
-      User: {
-        connect: {id: uid}
+      Organization: {
+        connect: {id: oid}
       }
     }
   })
   return reply.code(200).send({
-    data: merchant,
-    message: messages.merchant.MERCHANT_UPDATED
+    data: shop,
+    message: messages.shop.SHOP_UPDATED
   })
 }
 
 /**
- * Delete an existing merchant
+ * Delete an existing shop
  *
- * @namespace Merchant
- * @path {DELETE} /merchant/:merchantId
+ * @namespace Shop
+ * @path {DELETE} /shop/:shopId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -165,29 +165,29 @@ const editMerchantHandler = async (request: any, reply: FastifyReply) => {
  * @body {string} zip
  * @body {string} country
  */
-const deleteMerchantHandler = async (request: any, reply: FastifyReply) => {
-  const {uid} = request.auth
-  const {merchantId} = request.params
-  const merchant = await prisma.merchant.delete({
+const deleteShopHandler = async (request: any, reply: FastifyReply) => {
+  const {oid} = request.auth
+  const {shopId} = request.params
+  const shop = await prisma.shop.delete({
     where: {
-      uid_id: {
-        id: merchantId,
-        uid
+      id_oid: {
+        id: shopId,
+        oid
       }
     }
   })
   return reply.code(200).send({
-    data: merchant,
-    message: messages.merchant.MERCHANT_DELETED
+    data: shop,
+    message: messages.shop.SHOP_DELETED
   })
 }
 
-const getMerchant = {
-  handler: getMerchantHandler,
+const getShop = {
+  handler: getShopHandler,
   schema: {
     params: {
       type: 'object',
-      required: ['merchantId'],
+      required: ['shopId'],
       properties: {
         resetToken: {type: 'string', format: 'uuid'}
       }
@@ -196,12 +196,12 @@ const getMerchant = {
   preHandler: authPreHandler
 }
 
-const getAllMerchants = {
-  handler: getAllMerchantHandler,
+const getAllShops = {
+  handler: getAllShopHandler,
   preHandler: authPreHandler
 }
 
-const addMerchant = {
+const addShop = {
   schema: {
     body: {
       type: 'object',
@@ -228,11 +228,11 @@ const addMerchant = {
       }
     }
   },
-  handler: addMerchantHandler,
+  handler: addShopHandler,
   preHandler: authPreHandler
 }
 
-const editMerchant = {
+const editShop = {
   schema: {
     body: {
       type: 'object',
@@ -250,35 +250,35 @@ const editMerchant = {
     },
     params: {
       type: 'object',
-      required: ['merchantId'],
+      required: ['shopId'],
       properties: {
         resetToken: {type: 'string', format: 'uuid'}
       }
     }
   },
-  handler: editMerchantHandler,
+  handler: editShopHandler,
   preHandler: authPreHandler
 }
 
-const deleteMerchant = {
+const deleteShop = {
   schema: {
     params: {
       type: 'object',
-      required: ['merchantId'],
+      required: ['shopId'],
       properties: {
         resetToken: {type: 'string', format: 'uuid'}
       }
     }
   },
-  handler: deleteMerchantHandler,
+  handler: deleteShopHandler,
   preHandler: authPreHandler
 }
 
 // exported routes
-export const merchantRoutes: RouteOptions[] = [
-  {method: 'GET', url: '/merchant', ...getAllMerchants},
-  {method: 'GET', url: '/merchant/:merchantId', ...getMerchant},
-  {method: 'POST', url: '/merchant', ...addMerchant},
-  {method: 'PUT', url: '/merchant/:merchantId', ...editMerchant},
-  {method: 'DELETE', url: '/merchant/:merchantId', ...deleteMerchant}
+export const routes: RouteOptions[] = [
+  {method: 'GET', url: '/shop', ...getAllShops},
+  {method: 'GET', url: '/shop/:shopId', ...getShop},
+  {method: 'POST', url: '/shop', ...addShop},
+  {method: 'PUT', url: '/shop/:shopId', ...editShop},
+  {method: 'DELETE', url: '/shop/:shopId', ...deleteShop}
 ]

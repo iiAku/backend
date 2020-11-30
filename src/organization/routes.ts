@@ -12,14 +12,14 @@ import {v4 as uuidv4} from 'uuid'
 
 const isDev = config.env === 'dev'
 const prisma = new PrismaClient()
-// Const keyv = new Keyv("redis://user:pass@localhost:6379")
+// Const keyv = new Keyv("redis://organization:pass@localhost:6379")
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 /**
- * Register a new user
+ * Register a new organization
  *
- * @namespace Auth
- * @path {POST} /auth/register
+ * @namespace Organization
+ * @path {POST} /organization/register
  * @code {200} if the request is successful
  * @code {400} if email already exist
  * @body {String} email Email used for registration
@@ -36,7 +36,7 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
     password,
     config.PASSWORD_SALT_ROUNDS
   )
-  const user = await prisma.user.create({
+  const organization = await prisma.organization.create({
     data: {
       id: uuidv4(),
       email,
@@ -45,16 +45,16 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
   })
 
   return reply.code(200).send({
-    data: {user},
+    data: {organization},
     message: messages.auth.REGISTERED
   })
 }
 
 /**
- * Login a new user
+ * Login a new organization
  *
- * @namespace Auth
- * @path {POST} /auth/login
+ * @namespace Organization
+ * @path {POST} /organization/login
  * @code {200} if the request is successful
  * @code {400} if email already exist
  * @body {String} email Email used for registration
@@ -62,16 +62,16 @@ const registerHandler = async (request: any, reply: FastifyReply) => {
  */
 const loginHandler = async (request: any, reply: FastifyReply) => {
   const {email, password} = request.body
-  const user = await prisma.user.findUnique({
+  const organization = await prisma.organization.findUnique({
     where: {email}
   })
-  if (!user) {
+  if (!organization) {
     return reply.code(401).send({
       message: messages.auth.INVALID_CREDENTIALS
     })
   }
 
-  const compare = await bcrypt.compare(password, user.password)
+  const compare = await bcrypt.compare(password, organization.password)
   if (!compare) {
     return reply.code(401).send({
       message: messages.auth.INVALID_CREDENTIALS
@@ -83,27 +83,27 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
     data: {
       id: token,
       ip: request.ip,
-      User: {
-        connect: {id: user.id}
+      Organization: {
+        connect: {id: organization.id}
       }
     }
   })
   return reply.setCookie(config.AUTH_COOKIE_NAME, token).send({
     data: {
       session_token: token,
-      ...user
+      ...organization
     },
     message: messages.auth.LOGGED_IN
   })
 }
 
 /**
- * Logout an authenticated user
+ * Logout an organizationenticated organization
  *
- * @namespace Auth
- * @path {DELETE} /auth/logout
+ * @namespace Organization
+ * @path {DELETE} /organization/logout
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
+ * @organization This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
@@ -115,20 +115,20 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
 }
 
 /**
- * Revoke all others auth tokens
+ * Revoke all others organization tokens
  *
- * @namespace Auth
- * @path {DELETE} /auth/logout-all
+ * @namespace Organization
+ * @path {DELETE} /organization/logout-all
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
+ * @organization This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
  */
 const logoutAllHandler = async (request: any, reply: FastifyReply) => {
-  const {uid, id} = request.auth
+  const {oid, id} = request.auth
   await prisma.auth.deleteMany({
-    where: {uid, NOT: {id}}
+    where: {oid, NOT: {id}}
   })
   reply.code(200).send()
 }
@@ -136,10 +136,10 @@ const logoutAllHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Forgot password (wip - experimental)
  *
- * @namespace Auth
- * @path {POST} /auth/forgot-password
+ * @namespace Organization
+ * @path {POST} /organization/forgot-password
  * @code {400} if missing parameters
- * @code {401} if no existing user with email
+ * @code {401} if no existing organization with email
  * @code {200} if the request is successful
  */
 const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
@@ -148,8 +148,10 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
     return reply.code(400).send()
   }
 
-  const userFromEmail = await prisma.user.findUnique({where: {email}})
-  if (userFromEmail === null) {
+  const organizationFromEmail = await prisma.organization.findUnique({
+    where: {email}
+  })
+  if (organizationFromEmail === null) {
     return reply.code(401).send()
   }
 
@@ -158,7 +160,7 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
   const sendMail: () => Promise<void> = async () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // Send email to user
+        // Send email to organization
         console.log('Email sent')
         resolve()
       }, 500)
@@ -173,7 +175,7 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
     ),
     await keyv.set(
       `forgot:${resetToken}`,
-      userFromEmail,
+      organizationFromEmail,
       isDev ? 300 * 1000 : config.FORGOT_PASSWORD_EXPIRY_SEC
     ),
     sendMail
@@ -193,10 +195,10 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Reset password (wip - experimental)
  *
- * @namespace Auth
- * @path {POST} /auth/forgot-password
+ * @namespace Organization
+ * @path {POST} /organization/forgot-password
  * @code {400} if missing parameters
- * @code {401} if invalid reset token user with email
+ * @code {401} if invalid reset token organization with email
  * @code {200} if the request is successful
  */
 const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
@@ -227,7 +229,7 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
     newPassword,
     config.PASSWORD_SALT_ROUNDS
   )
-  const updatePassword = prisma.user.update({
+  const updatePassword = prisma.organization.update({
     where: {id: isValidToken.id},
     data: {
       password: hashedNewPassword
@@ -240,15 +242,15 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
 /**
  * Delete my account
  *
- * @namespace Auth
- * @path {DELETE} /auth/me
+ * @namespace Organization
+ * @path {DELETE} /organization/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
+ * @organization This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {String} id User's id to delete
+ * @body {String} id Organization's id to delete
  */
 const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   const {id} = request.auth
@@ -256,7 +258,7 @@ const deleteMeHandler = async (request: any, reply: FastifyReply) => {
     return reply.code(400).send()
   }
 
-  await prisma.user.delete({where: {id}})
+  await prisma.organization.delete({where: {id}})
   reply
     .code(200)
     .clearCookie(config.AUTH_COOKIE_NAME)
@@ -331,12 +333,16 @@ const resetPassword = {
 }
 
 // exported routes
-export const authRoutes: RouteOptions[] = [
-  {method: 'POST', url: '/auth/register', ...register},
-  {method: 'POST', url: '/auth/login', ...login},
-  {method: 'POST', url: '/auth/forgot-password', ...forgotPassword},
-  {method: 'POST', url: '/auth/reset-password/:resetToken', ...resetPassword},
-  {method: 'DELETE', url: '/auth/me', ...deleteMe},
-  {method: 'DELETE', url: '/auth/logout', ...logout},
-  {method: 'DELETE', url: '/auth/logout-all', ...logoutAll}
+export const routes: RouteOptions[] = [
+  {method: 'POST', url: '/organization/register', ...register},
+  {method: 'POST', url: '/organization/login', ...login},
+  {method: 'POST', url: '/organization/forgot-password', ...forgotPassword},
+  {
+    method: 'POST',
+    url: '/organization/reset-password/:resetToken',
+    ...resetPassword
+  },
+  {method: 'DELETE', url: '/organization/me', ...deleteMe},
+  {method: 'DELETE', url: '/organization/logout', ...logout},
+  {method: 'DELETE', url: '/organization/logout-all', ...logoutAll}
 ]

@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "postinstall": "tsc && mv -i -v public dist/ && rm -v -rf src",
     "dev": "nodemon dist/index.js",
-    "watch": "tsc -w",
+    "doc": "rm -rf documentation/ && ./node_modules/.bin/jsdoc -c jsdoc.conf -d documentation",
+    "watch": "rm -rf dist/ && tsc -w",
     "prisma-introspect": "npx prisma introspect --force",
     "prisma-generate": "npx prisma generate",
     "database-drop": "cat infra/docker_postgres_init.sql | heroku pg:psql -a dev-bob-api"

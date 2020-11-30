@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: auth/routes.js</title>
+    <title>JSDoc: Source: organization/routes.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: auth/routes.js</h1>
+    <h1 class="page-title">Source: organization/routes.js</h1>
 
     
 
@@ -28,7 +28,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authRoutes = void 0;
+exports.routes = void 0;
 const Keyv = require("keyv");
 const bcrypt = require("bcrypt");
 const utils_1 = require("../utils");
@@ -38,13 +38,13 @@ const messages_1 = require("../messages");
 const uuid_1 = require("uuid");
 const isDev = config_1.config.env === 'dev';
 const prisma = new client_1.PrismaClient();
-// Const keyv = new Keyv("redis://user:pass@localhost:6379")
+// Const keyv = new Keyv("redis://organization:pass@localhost:6379")
 const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse });
 /**
- * Register a new user
+ * Register a new organization
  *
- * @namespace Auth
- * @path {POST} /auth/register
+ * @namespace Organization
+ * @path {POST} /organization/register
  * @code {200} if the request is successful
  * @code {400} if email already exist
  * @body {String} email Email used for registration
@@ -57,7 +57,7 @@ const registerHandler = async (request, reply) => {
         return reply.code(400).send({ message: messages_1.messages.auth.EMAIL_ALREADY_IN_USE });
     }
     const hashedPassword = await bcrypt.hash(password, config_1.config.PASSWORD_SALT_ROUNDS);
-    const user = await prisma.user.create({
+    const organization = await prisma.organization.create({
         data: {
             id: uuid_1.v4(),
             email,
@@ -65,15 +65,15 @@ const registerHandler = async (request, reply) => {
         }
     });
     return reply.code(200).send({
-        data: { user },
+        data: { organization },
         message: messages_1.messages.auth.REGISTERED
     });
 };
 /**
- * Login a new user
+ * Login a new organization
  *
- * @namespace Auth
- * @path {POST} /auth/login
+ * @namespace Organization
+ * @path {POST} /organization/login
  * @code {200} if the request is successful
  * @code {400} if email already exist
  * @body {String} email Email used for registration
@@ -81,15 +81,15 @@ const registerHandler = async (request, reply) => {
  */
 const loginHandler = async (request, reply) => {
     const { email, password } = request.body;
-    const user = await prisma.user.findOne({
+    const organization = await prisma.organization.findUnique({
         where: { email }
     });
-    if (!user) {
+    if (!organization) {
         return reply.code(401).send({
             message: messages_1.messages.auth.INVALID_CREDENTIALS
         });
     }
-    const compare = await bcrypt.compare(password, user.password);
+    const compare = await bcrypt.compare(password, organization.password);
     if (!compare) {
         return reply.code(401).send({
             message: messages_1.messages.auth.INVALID_CREDENTIALS
@@ -100,26 +100,26 @@ const loginHandler = async (request, reply) => {
         data: {
             id: token,
             ip: request.ip,
-            User: {
-                connect: { id: user.id }
+            Organization: {
+                connect: { id: organization.id }
             }
         }
     });
     return reply.setCookie(config_1.config.AUTH_COOKIE_NAME, token).send({
         data: {
             session_token: token,
-            ...user
+            ...organization
         },
         message: messages_1.messages.auth.LOGGED_IN
     });
 };
 /**
- * Logout an authenticated user
+ * Logout an organizationenticated organization
  *
- * @namespace Auth
- * @path {DELETE} /auth/logout
+ * @namespace Organization
+ * @path {DELETE} /organization/logout
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
+ * @organization This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
@@ -130,30 +130,30 @@ const logoutHandler = async (request, reply) => {
     reply.code(200).clearCookie(config_1.config.AUTH_COOKIE_NAME).send();
 };
 /**
- * Revoke all others auth tokens
+ * Revoke all others organization tokens
  *
- * @namespace Auth
- * @path {DELETE} /auth/logout-all
+ * @namespace Organization
+ * @path {DELETE} /organization/logout-all
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
+ * @organization This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
  */
 const logoutAllHandler = async (request, reply) => {
-    const { uid, id } = request.auth;
+    const { oid, id } = request.auth;
     await prisma.auth.deleteMany({
-        where: { uid, NOT: { id } }
+        where: { oid, NOT: { id } }
     });
     reply.code(200).send();
 };
 /**
  * Forgot password (wip - experimental)
  *
- * @namespace Auth
- * @path {POST} /auth/forgot-password
+ * @namespace Organization
+ * @path {POST} /organization/forgot-password
  * @code {400} if missing parameters
- * @code {401} if no existing user with email
+ * @code {401} if no existing organization with email
  * @code {200} if the request is successful
  */
 const forgotPasswordHandler = async (request, reply) => {
@@ -161,15 +161,17 @@ const forgotPasswordHandler = async (request, reply) => {
     if (!email) {
         return reply.code(400).send();
     }
-    const userFromEmail = await prisma.user.findOne({ where: { email } });
-    if (userFromEmail === null) {
+    const organizationFromEmail = await prisma.organization.findUnique({
+        where: { email }
+    });
+    if (organizationFromEmail === null) {
         return reply.code(401).send();
     }
     const resetToken = uuid_1.v4();
     const sendMail = async () => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                // Send email to user
+                // Send email to organization
                 console.log('Email sent');
                 resolve();
             }, 500);
@@ -177,7 +179,7 @@ const forgotPasswordHandler = async (request, reply) => {
     };
     await Promise.all([
         await keyv.set(`forgot:${email}`, resetToken, isDev ? 300 * 1000 : config_1.config.FORGOT_PASSWORD_EXPIRY_SEC),
-        await keyv.set(`forgot:${resetToken}`, userFromEmail, isDev ? 300 * 1000 : config_1.config.FORGOT_PASSWORD_EXPIRY_SEC),
+        await keyv.set(`forgot:${resetToken}`, organizationFromEmail, isDev ? 300 * 1000 : config_1.config.FORGOT_PASSWORD_EXPIRY_SEC),
         sendMail
     ]);
     console.log('resetToken', resetToken);
@@ -194,10 +196,10 @@ const forgotPasswordHandler = async (request, reply) => {
 /**
  * Reset password (wip - experimental)
  *
- * @namespace Auth
- * @path {POST} /auth/forgot-password
+ * @namespace Organization
+ * @path {POST} /organization/forgot-password
  * @code {400} if missing parameters
- * @code {401} if invalid reset token user with email
+ * @code {401} if invalid reset token organization with email
  * @code {200} if the request is successful
  */
 const resetPasswordHandler = async (request, reply) => {
@@ -221,7 +223,7 @@ const resetPasswordHandler = async (request, reply) => {
             .send({ message: messages_1.messages.auth.INVALID_OR_EXPIRED_TOKEN });
     }
     const hashedNewPassword = await bcrypt.hash(newPassword, config_1.config.PASSWORD_SALT_ROUNDS);
-    const updatePassword = prisma.user.update({
+    const updatePassword = prisma.organization.update({
         where: { id: isValidToken.id },
         data: {
             password: hashedNewPassword
@@ -233,22 +235,22 @@ const resetPasswordHandler = async (request, reply) => {
 /**
  * Delete my account
  *
- * @namespace Auth
- * @path {DELETE} /auth/me
+ * @namespace Organization
+ * @path {DELETE} /organization/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
+ * @organization This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {String} id User's id to delete
+ * @body {String} id Organization's id to delete
  */
 const deleteMeHandler = async (request, reply) => {
     const { id } = request.auth;
     if (!id) {
         return reply.code(400).send();
     }
-    await prisma.user.delete({ where: { id } });
+    await prisma.organization.delete({ where: { id } });
     reply
         .code(200)
         .clearCookie(config_1.config.AUTH_COOKIE_NAME)
@@ -315,14 +317,18 @@ const resetPassword = {
     handler: resetPasswordHandler
 };
 // exported routes
-exports.authRoutes = [
-    { method: 'POST', url: '/auth/register', ...register },
-    { method: 'POST', url: '/auth/login', ...login },
-    { method: 'POST', url: '/auth/forgot-password', ...forgotPassword },
-    { method: 'POST', url: '/auth/reset-password/:resetToken', ...resetPassword },
-    { method: 'DELETE', url: '/auth/me', ...deleteMe },
-    { method: 'DELETE', url: '/auth/logout', ...logout },
-    { method: 'DELETE', url: '/auth/logout-all', ...logoutAll }
+exports.routes = [
+    { method: 'POST', url: '/organization/register', ...register },
+    { method: 'POST', url: '/organization/login', ...login },
+    { method: 'POST', url: '/organization/forgot-password', ...forgotPassword },
+    {
+        method: 'POST',
+        url: '/organization/reset-password/:resetToken',
+        ...resetPassword
+    },
+    { method: 'DELETE', url: '/organization/me', ...deleteMe },
+    { method: 'DELETE', url: '/organization/logout', ...logout },
+    { method: 'DELETE', url: '/organization/logout-all', ...logoutAll }
 ];
 </code></pre>
         </article>
@@ -334,13 +340,13 @@ exports.authRoutes = [
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a></li><li><a href="Merchant.html">Merchant</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Organization.html">Organization</a></li><li><a href="Shop.html">Shop</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Nov 23 2020 02:17:11 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Nov 29 2020 23:55:11 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>
