@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'production') {
     const element = path.join(parent, dir)
     if (isDirectory(element) && !keep.has(dir)) {
       console.log('removing dir', element)
-      fs.rmdirSync(element)
+      fs.rmdirSync(element, {recursive: true})
       continue
     }
 
