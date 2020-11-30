@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "postinstall": "tsc && node postinstall.js",
+    "postinstall": "tsc && node dist/postinstall.js",
     "dev": "nodemon dist/index.js",
     "doc": "rm -rf documentation/ && ./node_modules/.bin/jsdoc -c jsdoc.conf -d documentation",
     "watch": "rm -rf dist/ && tsc -w",
