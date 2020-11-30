@@ -103,7 +103,7 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Organization
  * @path {DELETE} /organization/logout
  * @code {200} if the request is successful
- * @organization This route requires a valid token cookie set in headers
+ * @auth This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
@@ -120,7 +120,7 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Organization
  * @path {DELETE} /organization/logout-all
  * @code {200} if the request is successful
- * @organization This route requires a valid token cookie set in headers
+ * @auth This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
@@ -246,7 +246,7 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
  * @path {DELETE} /organization/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful
- * @organization This route requires a valid token cookie set in headers
+ * @auth This route requires a valid token cookie set in headers
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
