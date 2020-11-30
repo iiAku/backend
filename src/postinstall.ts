@@ -4,14 +4,15 @@ if (process.env.NODE_ENV === 'production') {
   const parent = __dirname.split('/').slice(0, -1).join('/')
   const dirs = fs.readdirSync(parent)
   const keep = [
-    'dist',
-    'prisma',
-    'node_modules',
-    'Procfile',
     '.heroku',
+    '.profile.d',
+    'Procfile',
+    'dist',
+    'node_modules',
+    'package.json',
+    'prisma',
     'yarn.lock'
   ]
-
   const isDirectory = (element: string) => fs.lstatSync(element).isDirectory()
   const isFile = (element: string) => fs.lstatSync(element).isFile()
 
