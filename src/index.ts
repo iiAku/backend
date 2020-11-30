@@ -2,11 +2,11 @@ import fastify, {FastifyInstance} from 'fastify'
 
 import {AddressInfo} from 'net'
 import {RouteOptions} from 'fastify/types/route'
-import {authRoutes} from './auth/routes'
 import fastifyCookie from 'fastify-cookie'
-import {merchantRoutes} from './merchant/routes'
+import {routes as organizationRoutes} from './organization/routes'
+import {routes as shopRoutes} from './shop/routes'
 
-const routes: RouteOptions[] = authRoutes.concat(merchantRoutes)
+const routes: RouteOptions[] = [...organizationRoutes, ...shopRoutes]
 
 export const PORT = process.env.PORT || 3000
 export const HOST = process.env.PORT ? '0.0.0.0' : '127.0.0.1'
