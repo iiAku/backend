@@ -3,7 +3,14 @@ import * as path from 'path'
 if (process.env.NODE_ENV === 'production') {
   const parent = __dirname.split('/').slice(0, -1).join('/')
   const dirs = fs.readdirSync(parent)
-  const keep = new Set(['dist', 'prisma', 'node_modules', 'Procfile'])
+  const keep = [
+    'dist',
+    'prisma',
+    'node_modules',
+    'Procfile',
+    '.heroku',
+    'yarn.lock'
+  ]
 
   const isDirectory = (element: string) => fs.lstatSync(element).isDirectory()
   const isFile = (element: string) => fs.lstatSync(element).isFile()
