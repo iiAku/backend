@@ -20,7 +20,6 @@ CREATE TABLE "public"."Auth" (
 );
 
 CREATE TABLE "public"."Shop" (
-  "oid" uuid NOT NULL,
   "id" uuid UNIQUE NOT NULL,
   "name" VARCHAR(255) NOT NULL,
   "description" VARCHAR(255),
