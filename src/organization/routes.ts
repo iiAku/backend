@@ -97,7 +97,35 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
 }
 
 /**
- * Logout an organizationenticated organization
+ * Get an authenticated organization details
+ *
+ * @namespace Organization
+ * @path {GET} /organization
+ * @code {200} if the request is successful
+ * @auth This route requires a valid token cookie set in headers
+ * @code {401} if no cookies or malformed cookie
+ * @code {403} if expired cookie
+ * @code {500} if something went wrong
+ */
+const getHandler = async (request: any, reply: FastifyReply) => {
+  const {organizationId} = request.auth
+  const organization = await prisma.organization.findUnique({
+    where: {id: organizationId},
+    include: {
+      Menu: true,
+      MenuProduct: true,
+      MenuProductOption: true,
+      MenuCategory: true
+    }
+  })
+  return reply.send({
+    data: {...organization},
+    message: null
+  })
+}
+
+/**
+ * Logout an authenticated organization
  *
  * @namespace Organization
  * @path {DELETE} /organization/logout
@@ -125,9 +153,9 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
  * @code {500} if something went wrong
  */
 const logoutAllHandler = async (request: any, reply: FastifyReply) => {
-  const {oid, id} = request.auth
+  const {organizationId, id} = request.auth
   await prisma.auth.deleteMany({
-    where: {oid, NOT: {id}}
+    where: {organizationId, NOT: {id}}
   })
   reply.code(200).send()
 }
@@ -283,6 +311,11 @@ const login = {
   handler: loginHandler
 }
 
+const getOrganization = {
+  handler: getHandler,
+  preHandler: authPreHandler
+}
+
 const logout = {
   handler: logoutHandler,
   preHandler: authPreHandler
@@ -333,6 +366,7 @@ const resetPassword = {
 
 // exported routes
 export const routes: RouteOptions[] = [
+  {method: 'GET', url: '/organization', ...getOrganization},
   {method: 'POST', url: '/organization/register', ...register},
   {method: 'POST', url: '/organization/login', ...login},
   {method: 'POST', url: '/organization/forgot-password', ...forgotPassword},

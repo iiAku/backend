@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: shop/routes.js</title>
+    <title>JSDoc: Source: menu/category.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: shop/routes.js</h1>
+    <h1 class="page-title">Source: menu/category.js</h1>
 
     
 
@@ -40,10 +40,10 @@ const prisma = new client_1.PrismaClient();
 // Const keyv = new Keyv("redis://user:pass@localhost:6379")
 const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse });
 /**
- * Get a shop from user
+ * Get a menu-category from user
  *
- * @namespace Shop
- * @path {GET} /shop/:shopId
+ * @namespace MenuCategory
+ * @path {GET} /menu-category/:categoryId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -51,27 +51,27 @@ const keyv = new Keyv({ serialize: JSON.stringify, deserialize: JSON.parse });
  * @code {500} if something went wrong
  *
  */
-const getShopHandler = async (request, reply) => {
+const getCategoryHandler = async (request, reply) => {
     const { organizationId } = request.auth;
-    const { shopId } = request.params;
-    const shop = await prisma.shop.findUnique({
+    const { categoryId } = request.params;
+    const menuCategory = await prisma.menuCategory.findUnique({
         where: {
-            id_organizationId: {
-                id: shopId,
-                organizationId
+            id_orgnanizationId: {
+                id: categoryId,
+                orgnanizationId: organizationId
             }
         }
     });
     return reply.code(200).send({
-        data: shop,
+        data: menuCategory,
         message: null
     });
 };
 /**
- * Get all shop from user
+ * Get all menu-category from user
  *
- * @namespace Shop
- * @path {GET} /shop
+ * @namespace MenuCategory
+ * @path {GET} /menu-category
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -79,39 +79,31 @@ const getShopHandler = async (request, reply) => {
  * @code {500} if something went wrong
  *
  */
-const getAllShopHandler = async (request, reply) => {
+const getAllCategoryHandler = async (request, reply) => {
     const { organizationId } = request.auth;
-    const shops = await prisma.shop.findMany({
-        where: { organizationId }
+    const menuCategories = await prisma.menuCategory.findMany({
+        where: { orgnanizationId: organizationId }
     });
     return reply.code(200).send({
-        data: shops,
+        data: menuCategories,
         message: null
     });
 };
 /**
- * Add a new shop
+ * Add a new menu-category
  *
- * @namespace Shop
- * @path {POST} /shop
+ * @namespace MenuCategory
+ * @path {POST} /menu-category
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
  * @body {string} name
- * @body {string} description
- * @body {string} siret
- * @body {string} address_line
- * @body {string} address_line2
- * @body {string} city
- * @body {string} state
- * @body {string} zip
- * @body {string} country
  */
-const addShopHandler = async (request, reply) => {
+const addCategoryHandler = async (request, reply) => {
     const { organizationId } = request.auth;
-    const shop = await prisma.shop.create({
+    const menuCategory = await prisma.menuCategory.create({
         data: {
             id: uuid_1.v4(),
             ...request.body,
@@ -121,38 +113,30 @@ const addShopHandler = async (request, reply) => {
         }
     });
     return reply.code(200).send({
-        data: shop,
-        message: messages_1.messages.shop.ADDED
+        data: menuCategory,
+        message: messages_1.messages.default.ADDED
     });
 };
 /**
- * Edit an existing shop
+ * Edit an existing menu-category
  *
- * @namespace Shop
- * @path {PUT} /shop/:shopId
+ * @namespace MenuCategory
+ * @path {PUT} /menu-category/:categoryId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
  * @body {string} name
- * @body {string} description
- * @body {string} siret
- * @body {string} address_line
- * @body {string} address_line2
- * @body {string} city
- * @body {string} state
- * @body {string} zip
- * @body {string} country
  */
-const editShopHandler = async (request, reply) => {
+const editCategoryHandler = async (request, reply) => {
     const { organizationId } = request.auth;
-    const { shopId } = request.params;
-    const shop = await prisma.shop.update({
+    const { categoryId } = request.params;
+    const menuCategory = await prisma.menuCategory.update({
         where: {
-            id_organizationId: {
-                id: shopId,
-                organizationId
+            id_orgnanizationId: {
+                id: categoryId,
+                orgnanizationId: organizationId
             }
         },
         data: {
@@ -163,140 +147,107 @@ const editShopHandler = async (request, reply) => {
         }
     });
     return reply.code(200).send({
-        data: shop,
-        message: messages_1.messages.shop.UPDATED
+        data: menuCategory,
+        message: messages_1.messages.default.UPDATED
     });
 };
 /**
- * Delete an existing shop
+ * Delete an existing menu-category
  *
- * @namespace Shop
- * @path {DELETE} /shop/:shopId
+ * @namespace MenuCategory
+ * @path {DELETE} /menu-category/:categoryId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
  * @body {string} name
- * @body {string} description
- * @body {string} siret
- * @body {string} address_line
- * @body {string} address_line2
- * @body {string} city
- * @body {string} state
- * @body {string} zip
- * @body {string} country
  */
-const deleteShopHandler = async (request, reply) => {
+const deleteCategoryHandler = async (request, reply) => {
     const { organizationId } = request.auth;
-    const { shopId } = request.params;
-    const shop = await prisma.shop.delete({
+    const { categoryId } = request.params;
+    const menuCategory = await prisma.menuCategory.delete({
         where: {
-            id_organizationId: {
-                id: shopId,
-                organizationId
+            id_orgnanizationId: {
+                id: categoryId,
+                orgnanizationId: organizationId
             }
         }
     });
     return reply.code(200).send({
-        data: shop,
-        message: messages_1.messages.shop.DELETED
+        data: menuCategory,
+        message: messages_1.messages.default.DELETED
     });
 };
-const getShop = {
-    handler: getShopHandler,
+const getCategory = {
+    handler: getCategoryHandler,
     schema: {
         params: {
             type: 'object',
-            required: ['shopId'],
+            required: ['categoryId'],
             properties: {
-                shopId: { type: 'string', format: 'uuid' }
+                categoryId: { type: 'string', format: 'uuid' }
             }
         }
     },
     preHandler: utils_1.authPreHandler
 };
-const getAllShops = {
-    handler: getAllShopHandler,
+const getAllCategorys = {
+    handler: getAllCategoryHandler,
     preHandler: utils_1.authPreHandler
 };
-const addShop = {
+const addCategory = {
     schema: {
         body: {
             type: 'object',
-            required: [
-                'name',
-                'description',
-                'siret',
-                'address_line',
-                'city',
-                'state',
-                'zip',
-                'country'
-            ],
+            required: ['name'],
             properties: {
-                name: { type: 'string' },
-                description: { type: 'string' },
-                siret: { type: 'string' },
-                address_line: { type: 'string' },
-                address_line_2: { type: 'string' },
-                city: { type: 'string' },
-                state: { type: 'string' },
-                zip: { type: 'string' },
-                country: { type: 'string' }
+                name: { type: 'string' }
             }
         }
     },
-    handler: addShopHandler,
+    handler: addCategoryHandler,
     preHandler: utils_1.authPreHandler
 };
-const editShop = {
+const editCategory = {
     schema: {
         body: {
             type: 'object',
             properties: {
-                name: { type: 'string' },
-                description: { type: 'string' },
-                siret: { type: 'string' },
-                address_line: { type: 'string' },
-                address_line_2: { type: 'string' },
-                city: { type: 'string' },
-                state: { type: 'string' },
-                zip: { type: 'string' },
-                country: { type: 'string' }
+                name: { type: 'string' }
             }
         },
         params: {
             type: 'object',
-            required: ['shopId'],
+            required: ['categoryId'],
             properties: {
-                shopId: { type: 'string', format: 'uuid' }
+                categoryId: { type: 'string', format: 'uuid' }
             }
         }
     },
-    handler: editShopHandler,
+    handler: editCategoryHandler,
     preHandler: utils_1.authPreHandler
 };
-const deleteShop = {
+const deleteCategory = {
     schema: {
         params: {
             type: 'object',
-            required: ['shopId'],
+            required: ['categoryId'],
             properties: {
-                shopId: { type: 'string', format: 'uuid' }
+                categoryId: { type: 'string', format: 'uuid' }
             }
         }
     },
-    handler: deleteShopHandler,
+    handler: deleteCategoryHandler,
     preHandler: utils_1.authPreHandler
 };
 // exported routes
 exports.routes = [
-    { method: 'GET', url: '/shop', ...getAllShops },
-    { method: 'GET', url: '/shop/:shopId', ...getShop },
-    { method: 'POST', url: '/shop', ...addShop },
-    { method: 'PUT', url: '/shop/:shopId', ...editShop },
-    { method: 'DELETE', url: '/shop/:shopId', ...deleteShop }
+    { method: 'GET', url: '/menu-category', ...getAllCategorys },
+    { method: 'GET', url: '/menu-category/:categoryId', ...getCategory },
+    { method: 'POST', url: '/menu-category', ...addCategory },
+    { method: 'PUT', url: '/menu-category/:categoryId', ...editCategory },
+    { method: 'DELETE', url: '/menu-category/:categoryId', ...deleteCategory }
 ];
 </code></pre>
         </article>

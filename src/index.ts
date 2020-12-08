@@ -4,10 +4,21 @@ import {AddressInfo} from 'net'
 import {RouteOptions} from 'fastify/types/route'
 import fastifyCookie from 'fastify-cookie'
 import fastifyCors from 'fastify-cors'
+import {routes as menuCategoryRoutes} from './menu/category'
+import {routes as menuProductOptionRoutes} from './menu/option'
+import {routes as menuProductRoutes} from './menu/product'
+import {routes as menuRoutes} from './menu/routes'
 import {routes as organizationRoutes} from './organization/routes'
 import {routes as shopRoutes} from './shop/routes'
 
-const routes: RouteOptions[] = [...organizationRoutes, ...shopRoutes]
+const routes: RouteOptions[] = [
+  ...organizationRoutes,
+  ...shopRoutes,
+  ...menuCategoryRoutes,
+  ...menuProductRoutes,
+  ...menuProductOptionRoutes,
+  ...menuRoutes
+]
 
 export const PORT = process.env.PORT || 3000
 export const HOST = process.env.PORT ? '0.0.0.0' : '127.0.0.1'

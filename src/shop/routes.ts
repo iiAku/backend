@@ -26,13 +26,13 @@ const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
  *
  */
 const getShopHandler = async (request: any, reply: FastifyReply) => {
-  const {oid} = request.auth
+  const {organizationId} = request.auth
   const {shopId} = request.params
   const shop = await prisma.shop.findUnique({
     where: {
-      id_oid: {
+      id_organizationId: {
         id: shopId,
-        oid
+        organizationId
       }
     }
   })
@@ -55,9 +55,9 @@ const getShopHandler = async (request: any, reply: FastifyReply) => {
  *
  */
 const getAllShopHandler = async (request: any, reply: FastifyReply) => {
-  const {oid} = request.auth
+  const {organizationId} = request.auth
   const shops = await prisma.shop.findMany({
-    where: {oid}
+    where: {organizationId}
   })
   return reply.code(200).send({
     data: shops,
@@ -86,19 +86,19 @@ const getAllShopHandler = async (request: any, reply: FastifyReply) => {
  * @body {string} country
  */
 const addShopHandler = async (request: any, reply: FastifyReply) => {
-  const {oid} = request.auth
+  const {organizationId} = request.auth
   const shop = await prisma.shop.create({
     data: {
       id: uuidv4(),
       ...request.body,
       Organization: {
-        connect: {id: oid}
+        connect: {id: organizationId}
       }
     }
   })
   return reply.code(200).send({
     data: shop,
-    message: messages.shop.SHOP_ADDED
+    message: messages.shop.ADDED
   })
 }
 
@@ -123,25 +123,25 @@ const addShopHandler = async (request: any, reply: FastifyReply) => {
  * @body {string} country
  */
 const editShopHandler = async (request: any, reply: FastifyReply) => {
-  const {oid} = request.auth
+  const {organizationId} = request.auth
   const {shopId} = request.params
   const shop = await prisma.shop.update({
     where: {
-      id_oid: {
+      id_organizationId: {
         id: shopId,
-        oid
+        organizationId
       }
     },
     data: {
       ...request.body,
       Organization: {
-        connect: {id: oid}
+        connect: {id: organizationId}
       }
     }
   })
   return reply.code(200).send({
     data: shop,
-    message: messages.shop.SHOP_UPDATED
+    message: messages.shop.UPDATED
   })
 }
 
@@ -166,19 +166,19 @@ const editShopHandler = async (request: any, reply: FastifyReply) => {
  * @body {string} country
  */
 const deleteShopHandler = async (request: any, reply: FastifyReply) => {
-  const {oid} = request.auth
+  const {organizationId} = request.auth
   const {shopId} = request.params
   const shop = await prisma.shop.delete({
     where: {
-      id_oid: {
+      id_organizationId: {
         id: shopId,
-        oid
+        organizationId
       }
     }
   })
   return reply.code(200).send({
     data: shop,
-    message: messages.shop.SHOP_DELETED
+    message: messages.shop.DELETED
   })
 }
 
@@ -189,7 +189,7 @@ const getShop = {
       type: 'object',
       required: ['shopId'],
       properties: {
-        resetToken: {type: 'string', format: 'uuid'}
+        shopId: {type: 'string', format: 'uuid'}
       }
     }
   },
@@ -252,7 +252,7 @@ const editShop = {
       type: 'object',
       required: ['shopId'],
       properties: {
-        resetToken: {type: 'string', format: 'uuid'}
+        shopId: {type: 'string', format: 'uuid'}
       }
     }
   },
@@ -266,7 +266,7 @@ const deleteShop = {
       type: 'object',
       required: ['shopId'],
       properties: {
-        resetToken: {type: 'string', format: 'uuid'}
+        shopId: {type: 'string', format: 'uuid'}
       }
     }
   },
