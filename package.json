@@ -2,7 +2,7 @@
   "name": "bob-api",
   "version": "0.0.1",
   "engines": {
-    "node": "12.x"
+    "node": "14.x"
   },
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,7 @@
     "watch": "rm -rf dist/ && tsc -w",
     "prisma-introspect": "npx prisma introspect --force",
     "prisma-generate": "npx prisma generate",
+    "prisma": "npx prisma introspect --force && node prisma/bind.js && npx prisma generate",
     "database-drop": "cat infra/docker_postgres_init.sql | heroku pg:psql -a dev-bob-api"
   },
   "dependencies": {

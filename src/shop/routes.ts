@@ -98,7 +98,7 @@ const addShopHandler = async (request: any, reply: FastifyReply) => {
   })
   return reply.code(200).send({
     data: shop,
-    message: messages.shop.ADDED
+    message: messages.default.ADDED
   })
 }
 
@@ -141,7 +141,7 @@ const editShopHandler = async (request: any, reply: FastifyReply) => {
   })
   return reply.code(200).send({
     data: shop,
-    message: messages.shop.UPDATED
+    message: messages.default.UPDATED
   })
 }
 
@@ -178,7 +178,7 @@ const deleteShopHandler = async (request: any, reply: FastifyReply) => {
   })
   return reply.code(200).send({
     data: shop,
-    message: messages.shop.DELETED
+    message: messages.default.DELETED
   })
 }
 

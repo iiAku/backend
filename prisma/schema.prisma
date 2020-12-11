@@ -23,9 +23,9 @@ model Menu {
   name                    String?
   organizationId          String
   Organization            Organization              @relation(fields: [organizationId], references: [id])
-  MenuToCategory          MenuToCategory[]          @relation("MenuTo_MenuToCategory")
-  MenuToMenuProduct       MenuToMenuProduct[]       @relation("MenuTo_MenuToMenuProduct")
-  MenuToMenuProductOption MenuToMenuProductOption[] @relation("MenuTo_MenuToMenuProductOption")
+  categories          categories[]          @relation("MenuTo_categories")
+  productPrice       productPrice[]       @relation("MenuTo_productPrice")
+  optionPrice optionPrice[] @relation("MenuTo_optionPrice")
 
   @@id([id, organizationId])
 }
@@ -35,8 +35,8 @@ model MenuCategory {
   orgnanizationId           String
   name                      String?
   Organization              Organization                @relation(fields: [orgnanizationId], references: [id])
-  MenuCategoryToMenuProduct MenuCategoryToMenuProduct[] @relation("MenuCategoryTo_MenuCategoryToMenuProduct")
-  MenuToCategory            MenuToCategory[]            @relation("MenuCategoryTo_MenuToCategory")
+  products products[] @relation("MenuCategoryTo_products")
+  categories            categories[]            @relation("MenuCategoryTo_categories")
 
   @@id([id, orgnanizationId])
 }
@@ -47,9 +47,9 @@ model MenuProduct {
   name                           String
   description                    String?
   Organization                   Organization                     @relation(fields: [organizationId], references: [id])
-  MenuCategoryToMenuProduct      MenuCategoryToMenuProduct[]      @relation("MenuProductTo_MenuCategoryToMenuProduct")
-  MenuProductOptionToMenuProduct MenuProductOptionToMenuProduct[] @relation("MenuProductTo_MenuProductOptionToMenuProduct")
-  MenuToMenuProduct              MenuToMenuProduct[]              @relation("MenuProductTo_MenuToMenuProduct")
+  products      products[]      @relation("MenuProductTo_products")
+  options options[] @relation("MenuProductTo_options")
+  productPrice              productPrice[]              @relation("MenuProductTo_productPrice")
 
   @@id([id, organizationId])
 }
@@ -59,8 +59,8 @@ model MenuProductOption {
   organizationId                 String
   description                    String?
   Organization                   Organization                     @relation(fields: [organizationId], references: [id])
-  MenuProductOptionToMenuProduct MenuProductOptionToMenuProduct[] @relation("MenuProductOptionTo_MenuProductOptionToMenuProduct")
-  MenuToMenuProductOption        MenuToMenuProductOption[]        @relation("MenuProductOptionTo_MenuToMenuProductOption")
+  options options[] @relation("MenuProductOptionTo_options")
+  optionPrice        optionPrice[]        @relation("MenuProductOptionTo_optionPrice")
 
   @@id([id, organizationId])
 }
@@ -95,53 +95,53 @@ model Shop {
   @@id([id, organizationId])
 }
 
-model MenuCategoryToMenuProduct {
+model products {
   categoryId   String
   productId    String
-  MenuCategory MenuCategory @relation("MenuCategoryTo_MenuCategoryToMenuProduct", fields: [categoryId], references: [id])
-  MenuProduct  MenuProduct  @relation("MenuProductTo_MenuCategoryToMenuProduct", fields: [productId], references: [id])
+  MenuCategory MenuCategory @relation("MenuCategoryTo_products", fields: [categoryId], references: [id])
+  MenuProduct  MenuProduct  @relation("MenuProductTo_products", fields: [productId], references: [id])
 
   @@id([categoryId, productId])
   @@map("_MenuCategoryToMenuProduct")
 }
 
-model MenuProductOptionToMenuProduct {
+model options {
   optionId          String
   productId         String
-  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_MenuProductOptionToMenuProduct", fields: [optionId], references: [id])
-  MenuProduct       MenuProduct       @relation("MenuProductTo_MenuProductOptionToMenuProduct", fields: [productId], references: [id])
+  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_options", fields: [optionId], references: [id])
+  MenuProduct       MenuProduct       @relation("MenuProductTo_options", fields: [productId], references: [id])
 
   @@id([optionId, productId])
   @@map("_MenuProductOptionToMenuProduct")
 }
 
-model MenuToCategory {
+model categories {
   menuId       String
   categoryId   String
-  MenuCategory MenuCategory @relation("MenuCategoryTo_MenuToCategory", fields: [categoryId], references: [id])
-  Menu         Menu         @relation("MenuTo_MenuToCategory", fields: [menuId], references: [id])
+  MenuCategory MenuCategory @relation("MenuCategoryTo_categories", fields: [categoryId], references: [id])
+  Menu         Menu         @relation("MenuTo_categories", fields: [menuId], references: [id])
 
   @@id([menuId, categoryId])
   @@map("_MenuToCategory")
 }
 
-model MenuToMenuProduct {
+model productPrice {
   menuId      String
   productId   String
   price       Int
-  Menu        Menu        @relation("MenuTo_MenuToMenuProduct", fields: [menuId], references: [id])
-  MenuProduct MenuProduct @relation("MenuProductTo_MenuToMenuProduct", fields: [productId], references: [id])
+  Menu        Menu        @relation("MenuTo_productPrice", fields: [menuId], references: [id])
+  MenuProduct MenuProduct @relation("MenuProductTo_productPrice", fields: [productId], references: [id])
 
   @@id([menuId, productId])
   @@map("_MenuToMenuProduct")
 }
 
-model MenuToMenuProductOption {
+model optionPrice {
   menuId            String
   optionId          String
   price             Int
-  Menu              Menu              @relation("MenuTo_MenuToMenuProductOption", fields: [menuId], references: [id])
-  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_MenuToMenuProductOption", fields: [optionId], references: [id])
+  Menu              Menu              @relation("MenuTo_optionPrice", fields: [menuId], references: [id])
+  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_optionPrice", fields: [optionId], references: [id])
 
   @@id([menuId, optionId])
   @@map("_MenuToMenuProductOption")
