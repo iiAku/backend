@@ -7,7 +7,6 @@ import {RouteOptions} from 'fastify/types/route'
 import {authPreHandler} from '../utils'
 import {config} from '../config'
 import {messages} from '../messages'
-import {options} from '..'
 import {v4 as uuidv4} from 'uuid'
 
 const isDev = config.env === 'dev'
@@ -49,25 +48,17 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
                     select: {
                       name: true,
                       description: true,
+                      products: {
+                        select: {
+                          productId: true
+                        }
+                      },
                       productPrice: {
                         select: {
                           price: true
                         }
                       },
-                      options: {
-                        select: {
-                          MenuProductOption: {
-                            select: {
-                              description: true,
-                              optionPrice: {
-                                select: {
-                                  price: true
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
+                      options: true
                     }
                   }
                 }

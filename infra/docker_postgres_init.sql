@@ -100,28 +100,34 @@ CREATE TABLE "_MenuToCategory" (
 );
 
 -- Menu to Options price
-CREATE TABLE "_MenuToMenuProductOption" (
+CREATE TABLE "MenuToMenuProductOptionPrice" (
     "menuId" uuid NOT NULL,
     "optionId" uuid NOT NULL,
     "price" SMALLINT NOT NULL,
     FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("optionId") REFERENCES "public"."MenuProductOption"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("menuId","optionId")
+    PRIMARY KEY("menuId","optionId"),
+    UNIQUE("menuId","productId")
 );
 
 -- Menu to Product price
-CREATE TABLE "_MenuToMenuProduct" (
+CREATE TABLE "_MenuToMenuProductPrice" (
     "menuId" uuid NOT NULL,
     "productId" uuid NOT NULL,
     "price" SMALLINT NOT NULL,
     FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("menuId","productId")
+    PRIMARY KEY("menuId","productId"),
+    UNIQUE("menuId","productId")
 );
 
 
 INSERT INTO public."Organization" (id,email,"password","createdAt") VALUES 
 ('52992fb6-4ab9-4885-86bd-69b2e492783b','bob@bob.com','$2b$10$moHHY7lAhTOGX.btwCPetOuZN3OEY7PBHFSiJGHedqUnnIBLRwHA.','2020-12-01 18:08:45.174')
+;
+
+INSERT INTO public."Auth" (id,"organizationId",ip,"createdAt","updatedAt") VALUES 
+('152566af-87f1-4986-bb82-d4c505d0e5a7','52992fb6-4ab9-4885-86bd-69b2e492783b','127.0.0.1','2020-12-12 14:14:22.510','2020-12-12 14:14:22.510')
 ;
 
 INSERT INTO public."MenuProduct" (id,"organizationId","name",description) VALUES 
@@ -150,6 +156,10 @@ INSERT INTO public."Menu" (id,"organizationId") VALUES
 INSERT INTO public."_MenuToCategory" ("menuId","categoryId") VALUES 
 ('04ca3cc0-6699-49aa-8d58-4e937c616f00','007e7f4b-c520-4ef2-927b-cb75bce51bfc')
 ,('04ca3cc0-6699-49aa-8d58-4e937c616f00','8eea553e-2dc8-416f-afcf-e30ed2e1d274')
+;
+
+INSERT INTO public."Menu" (id,name,"organizationId") VALUES 
+('b053c5c9-32bf-4d7f-a5af-2876d6b8eadf','La carte des boissons avec du coca','52992fb6-4ab9-4885-86bd-69b2e492783b')
 ;
 
 -- CREATE TABLE "public"."Menu" (

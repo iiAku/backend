@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "postinstall": "tsc && node dist/postinstall.js",
-    "dev": "nodemon dist/index.js",
+    "dev": "lsof -ti :3000 | xargs kill -9; nodemon dist/index.js",
     "doc": "rm -rf documentation/ && ./node_modules/.bin/jsdoc -c jsdoc.conf -d documentation",
     "watch": "rm -rf dist/ && tsc -w",
     "prisma-introspect": "npx prisma introspect --force",

@@ -23,9 +23,9 @@ model Menu {
   name                    String?
   organizationId          String
   Organization            Organization              @relation(fields: [organizationId], references: [id])
+  optionPrice optionPrice[]
   categories          categories[]          @relation("MenuTo_categories")
   productPrice       productPrice[]       @relation("MenuTo_productPrice")
-  optionPrice optionPrice[] @relation("MenuTo_optionPrice")
 
   @@id([id, organizationId])
 }
@@ -59,10 +59,20 @@ model MenuProductOption {
   organizationId                 String
   description                    String?
   Organization                   Organization                     @relation(fields: [organizationId], references: [id])
+  optionPrice        optionPrice[]
   options options[] @relation("MenuProductOptionTo_options")
-  optionPrice        optionPrice[]        @relation("MenuProductOptionTo_optionPrice")
 
   @@id([id, organizationId])
+}
+
+model optionPrice {
+  menuId            String
+  optionId          String
+  price             Int
+  Menu              Menu              @relation(fields: [menuId], references: [id])
+  MenuProductOption MenuProductOption @relation(fields: [optionId], references: [id])
+
+  @@id([menuId, optionId])
 }
 
 model Organization {
@@ -132,17 +142,6 @@ model productPrice {
   Menu        Menu        @relation("MenuTo_productPrice", fields: [menuId], references: [id])
   MenuProduct MenuProduct @relation("MenuProductTo_productPrice", fields: [productId], references: [id])
 
-  @@id([menuId, productId])
+  @@unique([menuId, productId], name: "_productPrice_menuId_productId_key")
   @@map("_MenuToMenuProduct")
-}
-
-model optionPrice {
-  menuId            String
-  optionId          String
-  price             Int
-  Menu              Menu              @relation("MenuTo_optionPrice", fields: [menuId], references: [id])
-  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_optionPrice", fields: [optionId], references: [id])
-
-  @@id([menuId, optionId])
-  @@map("_MenuToMenuProductOption")
 }
