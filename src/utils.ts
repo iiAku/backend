@@ -53,3 +53,15 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
   await keyv.set(token, auth, 120 * 1000)
   request.auth = auth
 }
+
+// export const flatItems = (obj: any) => {
+//   Object.keys(obj).forEach((key) => {
+//     if (typeof obj[key] === 'object' && obj[key] != null) {
+//       if (Array.isArray(obj[key])) {
+//         obj[key] = obj[key].map((x) => ({...Object.values(x).pop()}))
+//       }
+//       flatItems(obj[key])
+//     }
+//   })
+//   return obj
+// }

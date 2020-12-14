@@ -51,10 +51,10 @@ CREATE TABLE "public"."Menu" (
 -- Unlinked menu data belongs to Organizations
 CREATE TABLE "public"."MenuCategory" (
   "id" uuid UNIQUE NOT NULL,
-  "orgnanizationId" uuid NOT NULL,
+  "organizationId" uuid NOT NULL,
   "name" VARCHAR(45),
-  PRIMARY KEY("id","orgnanizationId"),
-  FOREIGN KEY ("orgnanizationId") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE
+  PRIMARY KEY("id","organizationId"),
+  FOREIGN KEY ("organizationId") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE "public"."MenuProduct" (
@@ -99,27 +99,36 @@ CREATE TABLE "_MenuToCategory" (
     PRIMARY KEY("menuId","categoryId")
 );
 
--- Menu to Options price
-CREATE TABLE "MenuToMenuProductOptionPrice" (
+-- MenuOption to Options price
+CREATE TABLE "_MenuOptionToPrice" (
+    id SERIAL PRIMARY KEY,
     "menuId" uuid NOT NULL,
     "optionId" uuid NOT NULL,
     "price" SMALLINT NOT NULL,
     FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("optionId") REFERENCES "public"."MenuProductOption"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("menuId","optionId"),
-    UNIQUE("menuId","productId")
+    UNIQUE("menuId","optionId")
 );
 
--- Menu to Product price
-CREATE TABLE "_MenuToMenuProductPrice" (
-    "menuId" uuid NOT NULL,
-    "productId" uuid NOT NULL,
+-- -- MenuProduct to Product price
+-- CREATE TABLE "_MenuProductToPrice" (
+--     "menuId" uuid NOT NULL,
+--     "productId" uuid NOT NULL,
+--     "price" SMALLINT NOT NULL,
+--     FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
+--     FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct"(id) ON UPDATE CASCADE ON DELETE CASCADE,
+--     UNIQUE("menuId","productId")
+-- );
+
+CREATE TABLE "MenuProductToPrice" (
+    id SERIAL PRIMARY KEY,
+    "menuId" uuid NOT NULL UNIQUE,
+    "productId" uuid NOT NULL UNIQUE,
     "price" SMALLINT NOT NULL,
     FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("menuId","productId"),
-    UNIQUE("menuId","productId")
+    FOREIGN KEY ("productId") REFERENCES "public"."MenuProductOption"(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
 
 
 INSERT INTO public."Organization" (id,email,"password","createdAt") VALUES 
@@ -134,7 +143,7 @@ INSERT INTO public."MenuProduct" (id,"organizationId","name",description) VALUES
 ('d1110c45-61e4-4f6d-8e78-cba234fd49a2','52992fb6-4ab9-4885-86bd-69b2e492783b','Coca',NULL)
 ,('dd55f45c-ff18-4ed1-b4e6-f5618174043e','52992fb6-4ab9-4885-86bd-69b2e492783b','Fanta',NULL)
 ;
-INSERT INTO public."MenuCategory" (id,"orgnanizationId","name") VALUES 
+INSERT INTO public."MenuCategory" (id,"organizationId","name") VALUES 
 ('007e7f4b-c520-4ef2-927b-cb75bce51bfc','52992fb6-4ab9-4885-86bd-69b2e492783b','Boissons')
 ,('8eea553e-2dc8-416f-afcf-e30ed2e1d274','52992fb6-4ab9-4885-86bd-69b2e492783b','Tapas')
 ;

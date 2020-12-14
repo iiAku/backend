@@ -6,6 +6,7 @@ import {FastifyReply} from 'fastify'
 import {RouteOptions} from 'fastify/types/route'
 import {authPreHandler} from '../utils'
 import {config} from '../config'
+import {flatItems} from '../utils'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
@@ -37,36 +38,8 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
       }
     },
     select: {
-      categories: {
-        select: {
-          MenuCategory: {
-            select: {
-              name: true,
-              products: {
-                select: {
-                  MenuProduct: {
-                    select: {
-                      name: true,
-                      description: true,
-                      products: {
-                        select: {
-                          productId: true
-                        }
-                      },
-                      productPrice: {
-                        select: {
-                          price: true
-                        }
-                      },
-                      options: true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      MenuProductToPrice: true,
+      MenuOptionToPrice: true
     }
   })
 
@@ -118,15 +91,15 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
   const {name, products} = request.body
   const menuId = uuidv4()
 
-  const categories: Prisma.categoriesCreateOrConnectWithoutMenuInput[] = []
-  const productPrices: Prisma.productPriceCreateOrConnectWithoutMenuInput[] = []
-  const optionsPrices: Prisma.optionPriceCreateOrConnectWithoutMenuInput[] = []
+  const categories: Prisma.MenuToCategoryCreateOrConnectWithoutMenuInput[] = []
+  const productPrices: Prisma.MenuProductToPriceCreateOrConnectWithoutMenuInput[] = []
+  const optionsPrices: Prisma.MenuOptionToPriceCreateOrConnectWithoutMenuInput[] = []
 
-  let categoryIds = await prisma.products.findMany({
-    where: {OR: products.map((product) => ({productId: product.id}))}
+  const categoryIds = await prisma.menuCategoryToMenuProduct.findMany({
+    where: {OR: products.map((product: any) => ({productId: product.id}))}
   })
 
-  categoryIds = categoryIds.reduce((acc, category) => {
+  const categoryToProduct = categoryIds.reduce((acc: any, category) => {
     if (!(category.productId in acc)) {
       acc[category.productId] = category.categoryId
     }
@@ -134,46 +107,55 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
     return acc
   }, {})
 
+  console.log('categoryToProduct', categoryToProduct)
   for (const product of products) {
     //category
     categories.push({
       where: {
         menuId_categoryId: {
           menuId,
-          categoryId: categoryIds[product.id]
+          categoryId: categoryToProduct[product.id]
         }
       },
       create: {
         MenuCategory: {
           connect: {
-            id: categoryIds[product.id]
+            id_organizationId: {
+              id: categoryToProduct[product.id],
+              organizationId
+            }
           }
         }
       }
     })
 
-    //product
+    //product prices
     productPrices.push({
       where: {
-        menuId_productId: {
-          menuId,
-          productId: product.id
-        }
+        // _MenuProductToPrice_menuId_productId_key: {
+        //   menuId,
+        //   productId: product.id
+        // }
+        menuId,
+        productId: product.id
       },
       create: {
         price: product.price,
         MenuProduct: {
           connect: {
-            id: product.id
+            id_organizationId: {
+              id: product.id,
+              organizationId
+            }
           }
         }
       }
     })
-    //option
+    //options prices
     for (const option of product.options) {
       optionsPrices.push({
         where: {
-          menuId_optionId: {
+          _MenuOptionToPrice_menuId_optionId_key: {
             menuId,
             optionId: option.id
           }
@@ -182,7 +164,10 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
           price: option.price,
           MenuProductOption: {
             connect: {
-              id: option.id
+              id_organizationId: {
+                id: option.id,
+                organizationId
+              }
             }
           }
         }
@@ -190,17 +175,26 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
     }
   }
 
+  console.log(
+    JSON.stringify(
+      {
+        categories
+      },
+      null,
+      2
+    )
+  )
   const createData: Prisma.MenuCreateArgs = {
     data: {
       id: menuId,
       name,
-      categories: {
+      MenuToCategory: {
         connectOrCreate: categories
       },
-      // productPrice: {
+      // MenuProductToPrice: {
       //   connectOrCreate: productPrices
       // },
-      // optionPrice: {
+      // MenuOptionToPrice: {
       //   connectOrCreate: optionsPrices
       // },
       Organization: {
