@@ -42,8 +42,8 @@ CREATE TABLE "public"."Shop" (
 -- Menu from an Organization
 CREATE TABLE "public"."Menu" (
   "id" uuid UNIQUE NOT NULL,
-  "name" VARCHAR(255),
   "organizationId" uuid NOT NULL,
+  "name" VARCHAR(255),
   FOREIGN KEY ("organizationId") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY("id","organizationId")
 );
@@ -73,135 +73,60 @@ CREATE TABLE "public"."MenuProductOption" (
   PRIMARY KEY("id","organizationId"),
   FOREIGN KEY ("organizationId") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
--- m to n links
--- Category to Product
-CREATE TABLE "_MenuCategoryToMenuProduct" (
-    "categoryId" uuid NOT NULL,
-    "productId" uuid NOT NULL,
-    FOREIGN KEY ("categoryId")  REFERENCES "public"."MenuCategory"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("categoryId","productId")
-);
--- Product to Options
-CREATE TABLE "_MenuProductOptionToMenuProduct" (
-    "optionId" uuid NOT NULL,
-    "productId" uuid NOT NULL,
-    FOREIGN KEY ("optionId")  REFERENCES "public"."MenuProductOption"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("optionId","productId")
-);
--- Menu to Category
-CREATE TABLE "_MenuToCategory" (
-    "menuId" uuid NOT NULL,
-    "categoryId" uuid NOT NULL,
-    FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("categoryId") REFERENCES "public"."MenuCategory"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY("menuId","categoryId")
+
+CREATE TABLE "public"."LinkedCategory" (
+  "id" uuid NOT NULL UNIQUE,
+  "menuId" uuid NOT NULL,
+  "categoryId" uuid NOT NULL,
+  PRIMARY KEY("menuId","categoryId"),
+  FOREIGN KEY ("menuId") REFERENCES "public"."Menu" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("categoryId") REFERENCES "public"."MenuCategory" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- MenuOption to Options price
-CREATE TABLE "_MenuOptionToPrice" (
-    id SERIAL PRIMARY KEY,
-    "menuId" uuid NOT NULL,
-    "optionId" uuid NOT NULL,
-    "price" SMALLINT NOT NULL,
-    FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("optionId") REFERENCES "public"."MenuProductOption"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    UNIQUE("menuId","optionId")
+CREATE TABLE "public"."LinkedProduct" (
+  "id" uuid NOT NULL UNIQUE,
+  "productId" uuid NOT NULL,
+  "linkedCategoryId" uuid NOT NULL,
+  "price" SMALLINT NOT NULL,
+  PRIMARY KEY("productId","linkedCategoryId"),
+  FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("linkedCategoryId") REFERENCES "public"."LinkedCategory" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- -- MenuProduct to Product price
--- CREATE TABLE "_MenuProductToPrice" (
---     "menuId" uuid NOT NULL,
---     "productId" uuid NOT NULL,
---     "price" SMALLINT NOT NULL,
---     FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
---     FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct"(id) ON UPDATE CASCADE ON DELETE CASCADE,
---     UNIQUE("menuId","productId")
--- );
-
-CREATE TABLE "MenuProductToPrice" (
-    id SERIAL PRIMARY KEY,
-    "menuId" uuid NOT NULL UNIQUE,
-    "productId" uuid NOT NULL UNIQUE,
-    "price" SMALLINT NOT NULL,
-    FOREIGN KEY ("menuId")  REFERENCES "public"."Menu"(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("productId") REFERENCES "public"."MenuProductOption"(id) ON UPDATE CASCADE ON DELETE CASCADE
+CREATE TABLE "public"."LinkedOption" (
+  "id" uuid NOT NULL UNIQUE,
+  "productId" uuid NOT NULL,
+  "optionId" uuid NOT NULL,
+  "price" SMALLINT NOT NULL,
+  PRIMARY KEY("productId","optionId"),
+  FOREIGN KEY ("productId") REFERENCES "public"."LinkedProduct" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("optionId") REFERENCES "public"."MenuProductOption" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-
 
 
 INSERT INTO public."Organization" (id,email,"password","createdAt") VALUES 
-('52992fb6-4ab9-4885-86bd-69b2e492783b','bob@bob.com','$2b$10$moHHY7lAhTOGX.btwCPetOuZN3OEY7PBHFSiJGHedqUnnIBLRwHA.','2020-12-01 18:08:45.174')
+('e9d0f049-8c95-4489-b224-0390fc7df207','bob@bob.com','$2b$10$iq.xZjVzAUSd5C2YPBh4gO6AHOdwukAOvLG//d5UAaIv1xgFiKzRO','2020-12-15 20:28:39.886')
 ;
 
 INSERT INTO public."Auth" (id,"organizationId",ip,"createdAt","updatedAt") VALUES 
-('152566af-87f1-4986-bb82-d4c505d0e5a7','52992fb6-4ab9-4885-86bd-69b2e492783b','127.0.0.1','2020-12-12 14:14:22.510','2020-12-12 14:14:22.510')
+('8bd87d76-4358-45d8-a803-7be6e91540e1','e9d0f049-8c95-4489-b224-0390fc7df207','127.0.0.1','2020-12-15 20:29:05.024','2020-12-15 20:29:05.024')
+;
+
+INSERT INTO public."MenuCategory" (id,"organizationId","name") VALUES 
+('ae8ce485-31d5-47be-b1f2-e57ebd132092','e9d0f049-8c95-4489-b224-0390fc7df207','Boissons')
+,('219c601b-ff38-4108-86e3-4ff0f7a82734','e9d0f049-8c95-4489-b224-0390fc7df207','Tapas')
 ;
 
 INSERT INTO public."MenuProduct" (id,"organizationId","name",description) VALUES 
-('d1110c45-61e4-4f6d-8e78-cba234fd49a2','52992fb6-4ab9-4885-86bd-69b2e492783b','Coca',NULL)
-,('dd55f45c-ff18-4ed1-b4e6-f5618174043e','52992fb6-4ab9-4885-86bd-69b2e492783b','Fanta',NULL)
-;
-INSERT INTO public."MenuCategory" (id,"organizationId","name") VALUES 
-('007e7f4b-c520-4ef2-927b-cb75bce51bfc','52992fb6-4ab9-4885-86bd-69b2e492783b','Boissons')
-,('8eea553e-2dc8-416f-afcf-e30ed2e1d274','52992fb6-4ab9-4885-86bd-69b2e492783b','Tapas')
+('07f7b05b-aec2-4848-a715-46883bde8c72','e9d0f049-8c95-4489-b224-0390fc7df207','Coca','Boison au cola')
+,('65f52058-3576-4211-9c12-f18c655456d3','e9d0f049-8c95-4489-b224-0390fc7df207','Fanta','Boison à l''orange')
 ;
 
-INSERT INTO public."_MenuCategoryToMenuProduct" ("categoryId","productId") VALUES 
-('007e7f4b-c520-4ef2-927b-cb75bce51bfc','d1110c45-61e4-4f6d-8e78-cba234fd49a2')
-,('007e7f4b-c520-4ef2-927b-cb75bce51bfc','dd55f45c-ff18-4ed1-b4e6-f5618174043e')
+INSERT INTO public."Menu" (id,"organizationId","name") VALUES 
+('78daa9fa-551a-40f3-a060-807315f551eb','e9d0f049-8c95-4489-b224-0390fc7df207','L''utime carte des boissons happy hour')
 ;
 
 INSERT INTO public."MenuProductOption" (id,"organizationId",description) VALUES 
-('1ecbed1e-ffb3-4ff9-b8d7-fbb9abcf9e8c','52992fb6-4ab9-4885-86bd-69b2e492783b','1L')
-,('1ecbed1e-ffb3-4ff9-b8d7-fbb9abcf9e8b','52992fb6-4ab9-4885-86bd-69b2e492783b','2L')
+('1673d0cd-04dc-44b3-94a3-6894e0ce2358','e9d0f049-8c95-4489-b224-0390fc7df207','1L')
+,('1673d0cd-04dc-44b3-94a3-6894e0ce2359','e9d0f049-8c95-4489-b224-0390fc7df207','1/2L')
 ;
-
-INSERT INTO public."Menu" (id,"organizationId") VALUES 
-('04ca3cc0-6699-49aa-8d58-4e937c616f00','52992fb6-4ab9-4885-86bd-69b2e492783b')
-;
-
-INSERT INTO public."_MenuToCategory" ("menuId","categoryId") VALUES 
-('04ca3cc0-6699-49aa-8d58-4e937c616f00','007e7f4b-c520-4ef2-927b-cb75bce51bfc')
-,('04ca3cc0-6699-49aa-8d58-4e937c616f00','8eea553e-2dc8-416f-afcf-e30ed2e1d274')
-;
-
-INSERT INTO public."Menu" (id,name,"organizationId") VALUES 
-('b053c5c9-32bf-4d7f-a5af-2876d6b8eadf','La carte des boissons avec du coca','52992fb6-4ab9-4885-86bd-69b2e492783b')
-;
-
--- CREATE TABLE "public"."Menu" (
---   "id" uuid UNIQUE NOT NULL,
---   "oid" uuid NOT NULL,
---   "sid" uuid NOT NULL,
---   "mcid" uuid NOT NULL,
---   "title" VARCHAR(45),
---   PRIMARY KEY("id","oid","sid"),
---   CONSTRAINT "fk_menu.oid_organization.id" FOREIGN KEY ("oid") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
---   CONSTRAINT "fk_menu.sid_shop.id" FOREIGN KEY ("sid") REFERENCES "public"."Shop" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
---   CONSTRAINT "fk_menu.mcid_menu_category.id" FOREIGN KEY ("mcid") REFERENCES "public"."MenuCategory" ("id") ON UPDATE CASCADE ON DELETE CASCADE
--- );
-
--- CREATE TABLE "public"."MenuProduct" (
---   "id" uuid UNIQUE NOT NULL,
---   "oid" uuid NOT NULL,
---   "category" uuid NOT NULL,
---   "name" VARCHAR(45) NOT NULL,
---   "description" VARCHAR(255),
---   "price" SMALLINT,
---   PRIMARY KEY("id","oid","name"),
---   CONSTRAINT "fk_menu_product.oid_organization.id" FOREIGN KEY ("oid") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
---   CONSTRAINT "fk_menu_product.category.menu_category.id" FOREIGN KEY ("category") REFERENCES "public"."MenuCategory" ("id") ON UPDATE CASCADE ON DELETE CASCADE
--- );
-
--- CREATE TABLE "public"."MenuProductOption" (
---   "id" uuid UNIQUE NOT NULL,
---   "oid" uuid NOT NULL,
---   "product" uuid NOT NULL,
---   "description" VARCHAR(255) NOT NULL,
---   "price" SMALLINT,
---   PRIMARY KEY("id","oid"),
---   CONSTRAINT "fk_menu_product_option.oid_organization.id" FOREIGN KEY ("oid") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
---   CONSTRAINT "fk_menu_product_option.product.menu_product.id" FOREIGN KEY ("product") REFERENCES "public"."MenuProduct" ("id") ON UPDATE CASCADE ON DELETE CASCADE
--- );

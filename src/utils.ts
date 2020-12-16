@@ -54,14 +54,14 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
   request.auth = auth
 }
 
-// export const flatItems = (obj: any) => {
-//   Object.keys(obj).forEach((key) => {
-//     if (typeof obj[key] === 'object' && obj[key] != null) {
-//       if (Array.isArray(obj[key])) {
-//         obj[key] = obj[key].map((x) => ({...Object.values(x).pop()}))
-//       }
-//       flatItems(obj[key])
-//     }
-//   })
-//   return obj
-// }
+export const flatItems = (obj: any) => {
+  Object.keys(obj).forEach((key) => {
+    if (typeof obj[key] === 'object' && obj[key] != null) {
+      if (Array.isArray(obj[key])) {
+        return (obj[key] = obj[key].map((x) => ({...Object.values(x).pop()})))
+      }
+      flatItems(obj[key])
+    }
+  })
+  return obj
+}

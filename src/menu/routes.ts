@@ -1,12 +1,11 @@
 import * as Keyv from 'keyv'
 
 import {Prisma, PrismaClient} from '@prisma/client'
+import {authPreHandler, flatItems} from '../utils'
 
 import {FastifyReply} from 'fastify'
 import {RouteOptions} from 'fastify/types/route'
-import {authPreHandler} from '../utils'
 import {config} from '../config'
-import {flatItems} from '../utils'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
@@ -32,14 +31,39 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
   const {menuId} = request.params
   const menu = await prisma.menu.findUnique({
     where: {
-      id_organizationId: {
-        id: menuId,
-        organizationId
-      }
+      id: menuId
     },
     select: {
-      MenuProductToPrice: true,
-      MenuOptionToPrice: true
+      LinkedCategory: {
+        select: {
+          MenuCategory: {
+            select: {
+              name: true,
+              LinkedCategory: {
+                select: {
+                  LinkedProduct: {
+                    select: {
+                      MenuProduct: {
+                        select: {
+                          name: true,
+                          description: true
+                        }
+                      },
+                      price: true,
+                      LinkedOption: {
+                        select: {
+                          price: true,
+                          MenuProductOption: true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   })
 
@@ -88,124 +112,100 @@ const getAllMenuHandler = async (request: any, reply: FastifyReply) => {
  */
 const addMenuHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
-  const {name, products} = request.body
+  const {name, categories} = request.body
+
   const menuId = uuidv4()
+  const linkedCategories: Prisma.LinkedCategoryCreateOrConnectWithoutMenuInput[] = []
 
-  const categories: Prisma.MenuToCategoryCreateOrConnectWithoutMenuInput[] = []
-  const productPrices: Prisma.MenuProductToPriceCreateOrConnectWithoutMenuInput[] = []
-  const optionsPrices: Prisma.MenuOptionToPriceCreateOrConnectWithoutMenuInput[] = []
-
-  const categoryIds = await prisma.menuCategoryToMenuProduct.findMany({
-    where: {OR: products.map((product: any) => ({productId: product.id}))}
-  })
-
-  const categoryToProduct = categoryIds.reduce((acc: any, category) => {
-    if (!(category.productId in acc)) {
-      acc[category.productId] = category.categoryId
-    }
-    console.log(acc)
-    return acc
-  }, {})
-
-  console.log('categoryToProduct', categoryToProduct)
-  for (const product of products) {
-    //category
-    categories.push({
+  for (const category of categories) {
+    const {id: categoryId, products} = category
+    const linkedCategoryId = uuidv4()
+    linkedCategories.push({
       where: {
         menuId_categoryId: {
           menuId,
-          categoryId: categoryToProduct[product.id]
+          categoryId
         }
       },
       create: {
+        id: linkedCategoryId,
         MenuCategory: {
           connect: {
             id_organizationId: {
-              id: categoryToProduct[product.id],
+              id: categoryId,
               organizationId
             }
-          }
-        }
-      }
-    })
-
-    //product prices
-    productPrices.push({
-      where: {
-        // _MenuProductToPrice_menuId_productId_key: {
-        //   menuId,
-        //   productId: product.id
-        // }
-        menuId,
-        productId: product.id
-      },
-      create: {
-        price: product.price,
-        MenuProduct: {
-          connect: {
-            id_organizationId: {
-              id: product.id,
-              organizationId
-            }
-          }
-        }
-      }
-    })
-    //options prices
-    for (const option of product.options) {
-      optionsPrices.push({
-        where: {
-          _MenuOptionToPrice_menuId_optionId_key: {
-            menuId,
-            optionId: option.id
           }
         },
-        create: {
-          price: option.price,
-          MenuProductOption: {
-            connect: {
-              id_organizationId: {
-                id: option.id,
-                organizationId
+        LinkedProduct: {
+          connectOrCreate: products.map((product) => {
+            const {id: productId, price, options} = product
+            const linkedProductId = uuidv4()
+            return {
+              where: {
+                productId_linkedCategoryId: {
+                  productId,
+                  linkedCategoryId
+                }
+              },
+              create: {
+                id: linkedProductId,
+                price,
+                MenuProduct: {
+                  connect: {
+                    id_organizationId: {
+                      id: productId,
+                      organizationId
+                    }
+                  }
+                },
+                LinkedOption: {
+                  connectOrCreate: options.map((option) => {
+                    const {id: optionId, price} = option
+                    return {
+                      where: {
+                        productId_optionId: {
+                          productId: linkedProductId,
+                          optionId
+                        }
+                      },
+                      create: {
+                        id: uuidv4(),
+                        price,
+                        MenuProductOption: {
+                          connect: {
+                            id_organizationId: {
+                              id: optionId,
+                              organizationId
+                            }
+                          }
+                        }
+                      }
+                    }
+                  })
+                }
               }
             }
-          }
+          })
         }
-      })
-    }
+      }
+    })
   }
 
-  console.log(
-    JSON.stringify(
-      {
-        categories
-      },
-      null,
-      2
-    )
-  )
-  const createData: Prisma.MenuCreateArgs = {
+  const menu = await prisma.menu.create({
     data: {
       id: menuId,
       name,
-      MenuToCategory: {
-        connectOrCreate: categories
+      LinkedCategory: {
+        connectOrCreate: linkedCategories
       },
-      // MenuProductToPrice: {
-      //   connectOrCreate: productPrices
-      // },
-      // MenuOptionToPrice: {
-      //   connectOrCreate: optionsPrices
-      // },
       Organization: {
         connect: {
           id: organizationId
         }
       }
     }
-  }
-
-  const menu = await prisma.menu.create(createData)
+  })
 
   return reply.code(200).send({
     data: menu,

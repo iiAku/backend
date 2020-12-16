@@ -18,62 +18,79 @@ model Auth {
   @@id([id, organizationId])
 }
 
+model LinkedCategory {
+  id            String          @unique
+  menuId        String
+  categoryId    String
+  MenuCategory  MenuCategory    @relation(fields: [categoryId], references: [id])
+  Menu          Menu            @relation(fields: [menuId], references: [id])
+  LinkedProduct LinkedProduct[]
+
+  @@id([menuId, categoryId])
+}
+
+model LinkedOption {
+  id                String            @unique
+  productId         String
+  optionId          String
+  price             Int
+  MenuProductOption MenuProductOption @relation(fields: [optionId], references: [id])
+  LinkedProduct     LinkedProduct     @relation(fields: [productId], references: [id])
+
+  @@id([productId, optionId])
+}
+
+model LinkedProduct {
+  id               String         @unique
+  productId        String
+  linkedCategoryId String
+  price            Int
+  LinkedCategory   LinkedCategory @relation(fields: [linkedCategoryId], references: [id])
+  MenuProduct      MenuProduct    @relation(fields: [productId], references: [id])
+  LinkedOption     LinkedOption[]
+
+  @@id([productId, linkedCategoryId])
+}
+
 model Menu {
-  id                 String               @unique
-  name               String?
-  organizationId     String
-  Organization       Organization         @relation(fields: [organizationId], references: [id])
-  MenuProductToPrice MenuProductToPrice[]
-  MenuOptionToPrice  MenuOptionToPrice[]  @relation("MenuTo_MenuOptionToPrice")
-  MenuToCategory     MenuToCategory[]     @relation("MenuTo_MenuToCategory")
+  id             String           @unique
+  organizationId String
+  name           String?
+  Organization   Organization     @relation(fields: [organizationId], references: [id])
+  LinkedCategory LinkedCategory[]
 
   @@id([id, organizationId])
 }
 
 model MenuCategory {
-  id                        String                      @unique
-  organizationId            String
-  name                      String?
-  Organization              Organization                @relation(fields: [organizationId], references: [id])
-  MenuCategoryToMenuProduct MenuCategoryToMenuProduct[] @relation("MenuCategoryTo_MenuCategoryToMenuProduct")
-  MenuToCategory            MenuToCategory[]            @relation("MenuCategoryTo_MenuToCategory")
+  id             String           @unique
+  organizationId String
+  name           String?
+  Organization   Organization     @relation(fields: [organizationId], references: [id])
+  LinkedCategory LinkedCategory[]
 
   @@id([id, organizationId])
 }
 
 model MenuProduct {
-  id                             String                           @unique
-  organizationId                 String
-  name                           String
-  description                    String?
-  Organization                   Organization                     @relation(fields: [organizationId], references: [id])
-  MenuCategoryToMenuProduct      MenuCategoryToMenuProduct[]      @relation("MenuProductTo_MenuCategoryToMenuProduct")
-  MenuProductOptionToMenuProduct MenuProductOptionToMenuProduct[] @relation("MenuProductTo_MenuProductOptionToMenuProduct")
+  id             String          @unique
+  organizationId String
+  name           String
+  description    String?
+  Organization   Organization    @relation(fields: [organizationId], references: [id])
+  LinkedProduct  LinkedProduct[]
 
   @@id([id, organizationId])
 }
 
 model MenuProductOption {
-  id                             String                           @unique
-  organizationId                 String
-  description                    String?
-  Organization                   Organization                     @relation(fields: [organizationId], references: [id])
-  MenuProductToPrice             MenuProductToPrice[]
-  MenuOptionToPrice              MenuOptionToPrice[]              @relation("MenuProductOptionTo_MenuOptionToPrice")
-  MenuProductOptionToMenuProduct MenuProductOptionToMenuProduct[] @relation("MenuProductOptionTo_MenuProductOptionToMenuProduct")
+  id             String         @unique
+  organizationId String
+  description    String?
+  Organization   Organization   @relation(fields: [organizationId], references: [id])
+  LinkedOption   LinkedOption[]
 
   @@id([id, organizationId])
-}
-
-model MenuProductToPrice {
-  id                Int               @id @default(autoincrement())
-  menuId            String
-  productId         String
-  price             Int
-  Menu              Menu              @relation(fields: [menuId], references: [id])
-  MenuProductOption MenuProductOption @relation(fields: [productId], references: [id])
-
-  @@unique([id, menuId, productId], name: "MenuProductToPrice_id_menuId_productId_key")
 }
 
 model Organization {
@@ -104,46 +121,4 @@ model Shop {
   Organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@id([id, organizationId])
-}
-
-model MenuCategoryToMenuProduct {
-  categoryId   String
-  productId    String
-  MenuCategory MenuCategory @relation("MenuCategoryTo_MenuCategoryToMenuProduct", fields: [categoryId], references: [id])
-  MenuProduct  MenuProduct  @relation("MenuProductTo_MenuCategoryToMenuProduct", fields: [productId], references: [id])
-
-  @@id([categoryId, productId])
-  @@map("_MenuCategoryToMenuProduct")
-}
-
-model MenuOptionToPrice {
-  id                Int               @id @default(autoincrement())
-  menuId            String
-  optionId          String
-  price             Int
-  Menu              Menu              @relation("MenuTo_MenuOptionToPrice", fields: [menuId], references: [id])
-  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_MenuOptionToPrice", fields: [optionId], references: [id])
-
-  @@unique([menuId, optionId], name: "_MenuOptionToPrice_menuId_optionId_key")
-  @@map("_MenuOptionToPrice")
-}
-
-model MenuProductOptionToMenuProduct {
-  optionId          String
-  productId         String
-  MenuProductOption MenuProductOption @relation("MenuProductOptionTo_MenuProductOptionToMenuProduct", fields: [optionId], references: [id])
-  MenuProduct       MenuProduct       @relation("MenuProductTo_MenuProductOptionToMenuProduct", fields: [productId], references: [id])
-
-  @@id([optionId, productId])
-  @@map("_MenuProductOptionToMenuProduct")
-}
-
-model MenuToCategory {
-  menuId       String
-  categoryId   String
-  MenuCategory MenuCategory @relation("MenuCategoryTo_MenuToCategory", fields: [categoryId], references: [id])
-  Menu         Menu         @relation("MenuTo_MenuToCategory", fields: [menuId], references: [id])
-
-  @@id([menuId, categoryId])
-  @@map("_MenuToCategory")
 }
