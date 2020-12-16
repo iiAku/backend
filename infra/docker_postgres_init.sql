@@ -74,7 +74,7 @@ CREATE TABLE "public"."MenuProductOption" (
   FOREIGN KEY ("organizationId") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE "public"."LinkedCategory" (
+CREATE TABLE "public"."categories" (
   "id" uuid NOT NULL UNIQUE,
   "menuId" uuid NOT NULL,
   "categoryId" uuid NOT NULL,
@@ -83,23 +83,23 @@ CREATE TABLE "public"."LinkedCategory" (
   FOREIGN KEY ("categoryId") REFERENCES "public"."MenuCategory" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE "public"."LinkedProduct" (
+CREATE TABLE "public"."products" (
   "id" uuid NOT NULL UNIQUE,
   "productId" uuid NOT NULL,
-  "linkedCategoryId" uuid NOT NULL,
+  "categoriesId" uuid NOT NULL,
   "price" SMALLINT NOT NULL,
-  PRIMARY KEY("productId","linkedCategoryId"),
+  PRIMARY KEY("productId","categoriesId"),
   FOREIGN KEY ("productId") REFERENCES "public"."MenuProduct" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("linkedCategoryId") REFERENCES "public"."LinkedCategory" ("id") ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY ("categoriesId") REFERENCES "public"."categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE "public"."LinkedOption" (
+CREATE TABLE "public"."options" (
   "id" uuid NOT NULL UNIQUE,
   "productId" uuid NOT NULL,
   "optionId" uuid NOT NULL,
   "price" SMALLINT NOT NULL,
   PRIMARY KEY("productId","optionId"),
-  FOREIGN KEY ("productId") REFERENCES "public"."LinkedProduct" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("productId") REFERENCES "public"."products" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
   FOREIGN KEY ("optionId") REFERENCES "public"."MenuProductOption" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 

@@ -58,7 +58,7 @@ const getProductHandler = async (request: any, reply: FastifyReply) => {
 const getAllProductHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
   const menuCategories = await prisma.menuProduct.findMany({
-    where: {organizationId: organizationId}
+    where: {organizationId}
   })
   return reply.code(200).send({
     data: menuCategories,

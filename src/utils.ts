@@ -54,14 +54,30 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
   request.auth = auth
 }
 
-export const flatItems = (obj: any) => {
-  Object.keys(obj).forEach((key) => {
-    if (typeof obj[key] === 'object' && obj[key] != null) {
-      if (Array.isArray(obj[key])) {
-        return (obj[key] = obj[key].map((x) => ({...Object.values(x).pop()})))
+const flatten = (object: any, currentValue: any = {}, i = 0) => {
+  const from = object
+  const reduced = Object.entries(object).reduce((r, [key, value]) => {
+    if (typeof value === 'object' && !Array.isArray(object[key]) && i <= 0) {
+      flatten(value, r, i++)
+    } else {
+      currentValue[key] = value
+    }
+
+    return r
+  }, currentValue)
+  return reduced
+}
+
+export const flatItems = (object: any) => {
+  Object.keys(object).forEach((key) => {
+    if (typeof object[key] === 'object' && object[key] !== null) {
+      if (!Array.isArray(object[key])) {
+        const content = object[key]
+        object[key] = flatten(content)
       }
-      flatItems(obj[key])
+
+      flatItems(object[key])
     }
   })
-  return obj
+  return object
 }

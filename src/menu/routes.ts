@@ -1,7 +1,7 @@
 import * as Keyv from 'keyv'
 
 import {Prisma, PrismaClient} from '@prisma/client'
-import {authPreHandler, flatItems} from '../utils'
+import {authPreHandler, flatItems, isUUID} from '../utils'
 
 import {FastifyReply} from 'fastify'
 import {RouteOptions} from 'fastify/types/route'
@@ -34,28 +34,32 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
       id: menuId
     },
     select: {
-      LinkedCategory: {
+      name: true,
+      categories: {
         select: {
           MenuCategory: {
             select: {
-              name: true,
-              LinkedCategory: {
+              id: true,
+              name: true
+            }
+          },
+          products: {
+            select: {
+              MenuProduct: {
                 select: {
-                  LinkedProduct: {
+                  id: true,
+                  name: true,
+                  description: true
+                }
+              },
+              price: true,
+              options: {
+                select: {
+                  price: true,
+                  MenuProductOption: {
                     select: {
-                      MenuProduct: {
-                        select: {
-                          name: true,
-                          description: true
-                        }
-                      },
-                      price: true,
-                      LinkedOption: {
-                        select: {
-                          price: true,
-                          MenuProductOption: true
-                        }
-                      }
+                      id: true,
+                      description: true
                     }
                   }
                 }
@@ -68,7 +72,7 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
   })
 
   return reply.code(200).send({
-    data: menu,
+    data: flatItems(menu),
     message: null
   })
 }
@@ -88,7 +92,11 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
 const getAllMenuHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
   const menuCategories = await prisma.menu.findMany({
-    where: {organizationId}
+    where: {organizationId},
+    select: {
+      id: true,
+      name: true
+    }
   })
   return reply.code(200).send({
     data: menuCategories,
@@ -110,16 +118,17 @@ const getAllMenuHandler = async (request: any, reply: FastifyReply) => {
  * @param {{id: string, price: Number}} products
  * @param {{id: string, price: Number}} options
  */
-const addMenuHandler = async (request: any, reply: FastifyReply) => {
+
+const addMenuFunc = (request: any, reply: FastifyReply, withMenuId = '') => {
   const {organizationId} = request.auth
   const {name, categories} = request.body
 
-  const menuId = uuidv4()
-  const linkedCategories: Prisma.LinkedCategoryCreateOrConnectWithoutMenuInput[] = []
+  const menuId = isUUID(withMenuId, 4) ? withMenuId : uuidv4()
+  const linkedCategories: Prisma.categoriesCreateOrConnectWithoutMenuInput[] = []
 
   for (const category of categories) {
     const {id: categoryId, products} = category
-    const linkedCategoryId = uuidv4()
+    const categoriesId = uuidv4()
     linkedCategories.push({
       where: {
         menuId_categoryId: {
@@ -128,7 +137,7 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
         }
       },
       create: {
-        id: linkedCategoryId,
+        id: categoriesId,
         MenuCategory: {
           connect: {
             id_organizationId: {
@@ -137,19 +146,19 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
             }
           }
         },
-        LinkedProduct: {
-          connectOrCreate: products.map((product) => {
+        products: {
+          connectOrCreate: products.map((product: any) => {
             const {id: productId, price, options} = product
-            const linkedProductId = uuidv4()
+            const productsId = uuidv4()
             return {
               where: {
-                productId_linkedCategoryId: {
+                productId_categoriesId: {
                   productId,
-                  linkedCategoryId
+                  categoriesId
                 }
               },
               create: {
-                id: linkedProductId,
+                id: productsId,
                 price,
                 MenuProduct: {
                   connect: {
@@ -159,13 +168,13 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
                     }
                   }
                 },
-                LinkedOption: {
-                  connectOrCreate: options.map((option) => {
+                options: {
+                  connectOrCreate: options.map((option: any) => {
                     const {id: optionId, price} = option
                     return {
                       where: {
                         productId_optionId: {
-                          productId: linkedProductId,
+                          productId: productsId,
                           optionId
                         }
                       },
@@ -192,11 +201,11 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
     })
   }
 
-  const menu = await prisma.menu.create({
+  return prisma.menu.create({
     data: {
       id: menuId,
       name,
-      LinkedCategory: {
+      categories: {
         connectOrCreate: linkedCategories
       },
       Organization: {
@@ -206,7 +215,10 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
       }
     }
   })
+}
 
+const addMenuHandler = async (request: any, reply: FastifyReply) => {
+  const menu = await addMenuFunc(request, reply)
   return reply.code(200).send({
     data: menu,
     message: messages.default.ADDED
@@ -227,23 +239,15 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
  */
 const editMenuHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
+  const {name, categories} = request.body
   const {menuId} = request.params
-  const menu = await prisma.menu.update({
-    where: {
-      id_organizationId: {
-        id: menuId,
-        organizationId
-      }
-    },
-    data: {
-      ...request.body,
-      Organization: {
-        connect: {id: organizationId}
-      }
-    }
-  })
+
+  const addNewMenu = addMenuFunc(request, reply, menuId)
+  const deleteOldMenu = deleteMenuFunc(request, reply)
+  const [editedMenu] = await prisma.$transaction([addNewMenu, deleteOldMenu])
+
   return reply.code(200).send({
-    data: menu,
+    data: editedMenu,
     message: messages.default.UPDATED
   })
 }
@@ -260,17 +264,23 @@ const editMenuHandler = async (request: any, reply: FastifyReply) => {
  * @code {500} if something went wrong
  * @body {string} name
  */
-const deleteMenuHandler = async (request: any, reply: FastifyReply) => {
+const deleteMenuFunc = (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
   const {menuId} = request.params
-  const menu = await prisma.menu.delete({
-    where: {
-      id_organizationId: {
-        id: menuId,
-        organizationId
-      }
-    }
-  })
+  return prisma.$queryRaw`DELETE FROM public."Menu" WHERE id=${menuId} AND "organizationId"=${organizationId}`
+  // Comment - raw for now see https://github.com/prisma/prisma/issues/2810
+  // return prisma.menu.delete({
+  //   where: {
+  //     id_organizationId: {
+  //       id: menuId,
+  //       organizationId
+  //     }
+  //   }
+  // })
+}
+
+const deleteMenuHandler = async (request: any, reply: FastifyReply) => {
+  const menu = await deleteMenuFunc(request, reply)
   return reply.code(200).send({
     data: menu,
     message: messages.default.DELETED

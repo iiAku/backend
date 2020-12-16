@@ -13,7 +13,7 @@ import {v4 as uuidv4} from 'uuid'
 const prisma = new PrismaClient()
 // Const keyv = new Keyv("redis://organization:pass@localhost:6379")
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
-const isDev = process.env.NODE_ENV === 'production' ? false : true
+const isDev = process.env.NODE_ENV !== 'production'
 
 /**
  * Register a new organization

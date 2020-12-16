@@ -61,7 +61,7 @@ const getAllProductOptionHandler = async (
 ) => {
   const {organizationId} = request.auth
   const menuCategories = await prisma.menuProductOption.findMany({
-    where: {organizationId: organizationId}
+    where: {organizationId}
   })
   return reply.code(200).send({
     data: menuCategories,
