@@ -23,7 +23,8 @@ export const build = (options = {}) => {
       ) {
         return cb(null, true)
       }
-    }
+    },
+    credentials: true
   })
   for (const route of routes) {
     console.log(`${route.method} ${route.url}`)
