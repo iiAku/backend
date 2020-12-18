@@ -1,7 +1,6 @@
-import fastify, {FastifyInstance} from 'fastify'
-
 import {AddressInfo} from 'net'
 import {RouteOptions} from 'fastify/types/route'
+import fastify from 'fastify'
 import fastifyCors from 'fastify-cors'
 import {routes as menuCategoryRoutes} from './menu/category'
 import {routes as menuProductOptionRoutes} from './menu/option'
