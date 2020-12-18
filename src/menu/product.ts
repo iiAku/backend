@@ -8,11 +8,10 @@ import {v4 as uuidv4} from 'uuid'
 const prisma = new PrismaClient()
 
 /**
- * Get a shop from organization
+ * Get a menu-product from organization
  *
- * @namespace Shop
- * @path {GET} /shop/:shopId
- * @query shopId
+ * @namespace MenuProduct
+ * @path {GET} /menu-product/:productId
  * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
  * @code {401} if no token or malformed token
@@ -20,31 +19,29 @@ const prisma = new PrismaClient()
  * @code {500} if something went wrong
  *
  */
-const getShopHandler = async (request: any, reply: FastifyReply) => {
+const getProductHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
-  const {shopId} = request.params
-  const shop = await prisma.shop.findUnique({
+  const {productId} = request.params
+  const menuProduct = await prisma.menuProduct.findUnique({
     where: {
       id_organizationId: {
-        id: shopId,
-        organizationId
+        organizationId,
+        id: productId
       }
-    },
-    include: {
-      menus: true
     }
   })
+
   return reply.code(200).send({
-    data: shop,
+    data: menuProduct,
     message: null
   })
 }
 
 /**
- * Get all shop from organization
+ * Get all menu-product from organization
  *
- * @namespace Shop
- * @path {GET} /shop
+ * @namespace MenuProduct
+ * @path {GET} /menu-product
  * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
  * @code {401} if no token or malformed token
@@ -52,43 +49,32 @@ const getShopHandler = async (request: any, reply: FastifyReply) => {
  * @code {500} if something went wrong
  *
  */
-const getAllShopHandler = async (request: any, reply: FastifyReply) => {
+const getAllProductHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
-  const shops = await prisma.shop.findMany({
-    where: {organizationId},
-    include: {
-      menus: true
-    }
+  const menuCategories = await prisma.menuProduct.findMany({
+    where: {organizationId}
   })
   return reply.code(200).send({
-    data: shops,
+    data: menuCategories,
     message: null
   })
 }
 
 /**
- * Add a new shop
+ * Add a new menu-product
  *
- * @namespace Shop
- * @path {POST} /shop
+ * @namespace MenuProduct
+ * @path {POST} /menu-product
  * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
  * @code {401} if no token or malformed token
  * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
- * @body {string} description
- * @body {string} siret
- * @body {string} address_line
- * @body {string} address_line2
- * @body {string} city
- * @body {string} state
- * @body {string} zip
- * @body {string} country
  */
-const addShopHandler = async (request: any, reply: FastifyReply) => {
+const addProductHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
-  const shop = await prisma.shop.create({
+  const menuProduct = await prisma.menuProduct.create({
     data: {
       id: uuidv4(),
       ...request.body,
@@ -98,38 +84,30 @@ const addShopHandler = async (request: any, reply: FastifyReply) => {
     }
   })
   return reply.code(200).send({
-    data: shop,
+    data: menuProduct,
     message: messages.default.ADDED
   })
 }
 
 /**
- * Edit an existing shop
+ * Edit an existing menu-product
  *
- * @namespace Shop
- * @path {PUT} /shop/:shopId
+ * @namespace MenuProduct
+ * @path {PUT} /menu-product/:productId
  * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
  * @code {401} if no token or malformed token
  * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
- * @body {string} description
- * @body {string} siret
- * @body {string} address_line
- * @body {string} address_line2
- * @body {string} city
- * @body {string} state
- * @body {string} zip
- * @body {string} country
  */
-const editShopHandler = async (request: any, reply: FastifyReply) => {
+const editProductHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
-  const {shopId} = request.params
-  const shop = await prisma.shop.update({
+  const {productId} = request.params
+  const menuProduct = await prisma.menuProduct.update({
     where: {
       id_organizationId: {
-        id: shopId,
+        id: productId,
         organizationId
       }
     },
@@ -141,137 +119,114 @@ const editShopHandler = async (request: any, reply: FastifyReply) => {
     }
   })
   return reply.code(200).send({
-    data: shop,
+    data: menuProduct,
     message: messages.default.UPDATED
   })
 }
 
 /**
- * Delete an existing shop
+ * Delete an existing menu-product
  *
- * @namespace Shop
- * @path {DELETE} /shop/:shopId
- * @query shopId
+ * @namespace MenuProduct
+ * @path {DELETE} /menu-product/:productId
  * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
  * @code {401} if no token or malformed token
  * @code {403} if expired token
  * @code {500} if something went wrong
+ * @body {string} name
  */
-const deleteShopHandler = async (request: any, reply: FastifyReply) => {
+const deleteProductHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
-  const {shopId} = request.params
-  const shop = await prisma.shop.delete({
+  const {productId} = request.params
+  const menuProduct = await prisma.menuProduct.delete({
     where: {
       id_organizationId: {
-        id: shopId,
+        id: productId,
         organizationId
       }
     }
   })
   return reply.code(200).send({
-    data: shop,
+    data: menuProduct,
     message: messages.default.DELETED
   })
 }
 
-const getShop = {
-  handler: getShopHandler,
+const getProduct = {
+  handler: getProductHandler,
   schema: {
     params: {
       type: 'object',
-      required: ['shopId'],
+      required: ['productId'],
       properties: {
-        shopId: {type: 'string', format: 'uuid'}
+        productId: {type: 'string', format: 'uuid'}
       }
     }
   },
   preHandler: authPreHandler
 }
 
-const getAllShops = {
-  handler: getAllShopHandler,
+const getAllProducts = {
+  handler: getAllProductHandler,
   preHandler: authPreHandler
 }
 
-const addShop = {
+const addProduct = {
   schema: {
     body: {
       type: 'object',
-      required: [
-        'name',
-        'description',
-        'siret',
-        'address_line',
-        'city',
-        'state',
-        'zip',
-        'country'
-      ],
+      required: ['name'],
       properties: {
         name: {type: 'string'},
-        description: {type: 'string'},
-        siret: {type: 'string'},
-        address_line: {type: 'string'},
-        address_line_2: {type: 'string'},
-        city: {type: 'string'},
-        state: {type: 'string'},
-        zip: {type: 'string'},
-        country: {type: 'string'}
+        description: {type: 'string'}
       }
     }
   },
-  handler: addShopHandler,
+  handler: addProductHandler,
   preHandler: authPreHandler
 }
 
-const editShop = {
+const editProduct = {
   schema: {
     body: {
       type: 'object',
       properties: {
         name: {type: 'string'},
-        description: {type: 'string'},
-        siret: {type: 'string'},
-        address_line: {type: 'string'},
-        address_line_2: {type: 'string'},
-        city: {type: 'string'},
-        state: {type: 'string'},
-        zip: {type: 'string'},
-        country: {type: 'string'}
+        description: {type: 'string'}
       }
     },
     params: {
       type: 'object',
-      required: ['shopId'],
+      required: ['productId'],
       properties: {
-        shopId: {type: 'string', format: 'uuid'}
+        productId: {type: 'string', format: 'uuid'}
       }
     }
   },
-  handler: editShopHandler,
+  handler: editProductHandler,
   preHandler: authPreHandler
 }
 
-const deleteShop = {
+const deleteProduct = {
   schema: {
     params: {
       type: 'object',
-      required: ['shopId'],
+      required: ['productId'],
       properties: {
-        shopId: {type: 'string', format: 'uuid'}
+        productId: {type: 'string', format: 'uuid'}
       }
     }
   },
-  handler: deleteShopHandler,
+  handler: deleteProductHandler,
   preHandler: authPreHandler
 }
 
 // exported routes
 export const routes: RouteOptions[] = [
-  {method: 'GET', url: '/shop', ...getAllShops},
-  {method: 'GET', url: '/shop/:shopId', ...getShop},
-  {method: 'POST', url: '/shop', ...addShop},
-  {method: 'PUT', url: '/shop/:shopId', ...editShop},
-  {method: 'DELETE', url: '/shop/:shopId', ...deleteShop}
+  {method: 'GET', url: '/menu-product', ...getAllProducts},
+  {method: 'GET', url: '/menu-product/:productId', ...getProduct},
+  {method: 'POST', url: '/menu-product', ...addProduct},
+  {method: 'PUT', url: '/menu-product/:productId', ...editProduct},
+  {method: 'DELETE', url: '/menu-product/:productId', ...deleteProduct}
 ]

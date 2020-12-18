@@ -28,14 +28,13 @@ export const emailExist = async (email: string) => {
 
 export const authPreHandler = async (request: any, reply: FastifyReply) => {
   if (
-    !request.cookies ||
-    !(config.AUTH_COOKIE_NAME in request.cookies) ||
-    !isUUID(request.cookies[config.AUTH_COOKIE_NAME], 4)
+    !(config.AUTH_HEADER_NAME in request.headers) ||
+    !isUUID(request.headers[config.AUTH_HEADER_NAME], 4)
   ) {
-    return reply.code(401).send({message: messages.auth.INVALID_COOKIE})
+    return reply.code(401).send({message: messages.auth.INVALID_TOKEN})
   }
 
-  const {token} = request.cookies
+  const token = request.headers[config.AUTH_HEADER_NAME]
   let auth = await keyv.get(token)
 
   if (!auth) {
@@ -44,7 +43,7 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
       include: {Organization: true}
     })
     if (!userFromToken) {
-      return reply.code(403).send({message: messages.auth.EXPIRED_COOKIE})
+      return reply.code(403).send({message: messages.auth.EXPIRED_TOKEN})
     }
 
     auth = userFromToken
@@ -52,4 +51,32 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
 
   await keyv.set(token, auth, 120 * 1000)
   request.auth = auth
+}
+
+const flatten = (object: any, currentValue: any = {}, i = 0) => {
+  const from = object
+  const reduced = Object.entries(object).reduce((r, [key, value]) => {
+    if (typeof value === 'object' && !Array.isArray(object[key]) && i <= 0) {
+      flatten(value, r, i++)
+    } else {
+      currentValue[key] = value
+    }
+
+    return r
+  }, currentValue)
+  return reduced
+}
+
+export const flatItems = (object: any) => {
+  Object.keys(object).forEach((key) => {
+    if (typeof object[key] === 'object' && object[key] !== null) {
+      if (!Array.isArray(object[key])) {
+        const content = object[key]
+        object[key] = flatten(content)
+      }
+
+      flatItems(object[key])
+    }
+  })
+  return object
 }

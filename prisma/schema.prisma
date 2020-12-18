@@ -8,38 +8,129 @@ datasource db {
 }
 
 model Auth {
-  id           String       @unique
-  oid          String
-  ip           String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now())
-  Organization Organization @relation(fields: [oid], references: [id])
+  id             String       @unique
+  organizationId String
+  ip             String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+  Organization   Organization @relation(fields: [organizationId], references: [id])
 
-  @@id([id, oid])
+  @@id([id, organizationId])
+}
+
+model Menu {
+  id             String       @unique
+  organizationId String
+  name           String?
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  categories     categories[]
+  menus          menus[]
+
+  @@id([id, organizationId])
+}
+
+model MenuCategory {
+  id             String       @unique
+  organizationId String
+  name           String?
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  categories     categories[]
+
+  @@id([id, organizationId])
+}
+
+model MenuProduct {
+  id             String       @unique
+  organizationId String
+  name           String
+  description    String?
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  products       products[]
+
+  @@id([id, organizationId])
+}
+
+model MenuProductOption {
+  id             String       @unique
+  organizationId String
+  description    String?
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  options        options[]
+
+  @@id([id, organizationId])
 }
 
 model Organization {
-  id        String   @id
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  Auth      Auth[]
-  Shop      Shop[]
+  id                String              @id
+  email             String              @unique
+  password          String
+  createdAt         DateTime            @default(now())
+  Auth              Auth[]
+  Menu              Menu[]
+  MenuCategory      MenuCategory[]
+  MenuProduct       MenuProduct[]
+  MenuProductOption MenuProductOption[]
+  Shop              Shop[]
 }
 
 model Shop {
-  oid           String
-  id            String       @unique
-  name          String
-  description   String?
-  siret         String
-  address_line  String
-  address_line2 String?
-  city          String
-  state         String
-  zip           String
-  country       String
-  Organization  Organization @relation(fields: [oid], references: [id])
+  id             String       @unique
+  organizationId String
+  name           String
+  description    String?
+  siret          String
+  address_line   String
+  address_line2  String?
+  city           String
+  state          String
+  zip            String
+  country        String
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  menus          menus[]
 
-  @@id([id, oid])
+  @@id([id, organizationId])
+}
+
+model categories {
+  id           String       @unique
+  menuId       String
+  categoryId   String
+  MenuCategory MenuCategory @relation(fields: [categoryId], references: [id])
+  Menu         Menu         @relation(fields: [menuId], references: [id])
+  products     products[]
+
+  @@id([menuId, categoryId])
+}
+
+model menus {
+  id     String @unique
+  menuId String
+  shopId String
+  Menu   Menu   @relation(fields: [menuId], references: [id])
+  Shop   Shop   @relation(fields: [shopId], references: [id])
+
+  @@id([menuId, shopId])
+}
+
+model options {
+  id                String            @unique
+  productId         String
+  optionId          String
+  price             Int
+  MenuProductOption MenuProductOption @relation(fields: [optionId], references: [id])
+  products          products          @relation(fields: [productId], references: [id])
+
+  @@id([productId, optionId])
+}
+
+model products {
+  id           String      @unique
+  productId    String
+  categoriesId String
+  price        Int
+  categories   categories  @relation(fields: [categoriesId], references: [id])
+  MenuProduct  MenuProduct @relation(fields: [productId], references: [id])
+  options      options[]
+
+  @@id([productId, categoriesId])
 }

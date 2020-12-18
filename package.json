@@ -2,37 +2,38 @@
   "name": "bob-api",
   "version": "0.0.1",
   "engines": {
-    "node": "12.x"
+    "node": "14.x"
   },
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
     "postinstall": "tsc && node dist/postinstall.js",
-    "dev": "nodemon dist/index.js",
+    "dev": "lsof -ti :3000 | xargs kill -9; nodemon dist/index.js",
     "doc": "rm -rf documentation/ && ./node_modules/.bin/jsdoc -c jsdoc.conf -d documentation",
     "watch": "rm -rf dist/ && tsc -w",
     "prisma-introspect": "npx prisma introspect --force",
     "prisma-generate": "npx prisma generate",
+    "prisma": "npx prisma introspect --force && npx prisma generate",
     "database-drop": "cat infra/docker_postgres_init.sql | heroku pg:psql -a dev-bob-api"
   },
   "dependencies": {
-    "@prisma/cli": "^2.11.0",
-    "@prisma/client": "^2.11.0",
+    "@prisma/client": "^2.13.0",
     "@types/bcrypt": "^3.0.0",
     "@types/keyv": "^3.1.1",
     "@types/node": "^14.11.10",
     "@types/uuid": "^8.3.0",
     "bcrypt": "^5.0.0",
     "fastify": "^3.7.0",
-    "fastify-cookie": "^4.1.0",
     "fastify-cors": "^5.0.0",
     "fs": "^0.0.1-security",
     "keyv": "^4.0.3",
+    "lodash": "^4.17.20",
     "nanoid": "^3.1.16",
     "phin": "^3.5.0",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
+    "@prisma/cli": "^2.13.0",
     "ava": "^3.13.0",
     "jsdoc": "^3.6.6",
     "jsdoc-http-plugin": "^0.3.2",

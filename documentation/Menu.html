@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: Shop</title>
+    <title>JSDoc: Namespace: Menu</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Namespace: Shop</h1>
+    <h1 class="page-title">Namespace: Menu</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2>Shop</h2>
+        <h2>Menu</h2>
         
     
 </header>
@@ -42,10 +42,10 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">GET</td>
-                            <td class="name last">/shop/:shopId</td>
+                            <td class="name last">/menu/:menuId</td>
                             </tr>
                             </table>
-                            <p>Get a shop from organization
+                            <p>Get a menu from organization
 <h5>Authentication</h5>
 <p>This route requires a valid Authorization token set in headers</p></p>
                             <h5>Query Parameters:</h5>
@@ -60,7 +60,7 @@
               </tr>
             </thead>
             <tr>
-            <td class="name">shopId</td>
+            <td class="name">menuId</td>
             <td class="type"></td>
             
             
@@ -138,7 +138,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shop_routes.js.html">shop/routes.js</a>, <a href="shop_routes.js.html#line9">line 9</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -187,7 +187,7 @@
 
 <header>
     
-        <h2>Shop</h2>
+        <h2>Menu</h2>
         
     
 </header>
@@ -201,10 +201,10 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">GET</td>
-                            <td class="name last">/shop</td>
+                            <td class="name last">/menu</td>
                             </tr>
                             </table>
-                            <p>Get all shop from organization
+                            <p>Get all menu from organization
 <h5>Authentication</h5>
 <p>This route requires a valid Authorization token set in headers</p></p>
                             <h5>Response Code:</h5>
@@ -278,7 +278,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shop_routes.js.html">shop/routes.js</a>, <a href="shop_routes.js.html#line41">line 41</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -327,7 +327,7 @@
 
 <header>
     
-        <h2>Shop</h2>
+        <h2>Menu</h2>
         
     
 </header>
@@ -341,10 +341,10 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">POST</td>
-                            <td class="name last">/shop</td>
+                            <td class="name last">/menu</td>
                             </tr>
                             </table>
-                            <p>Add a new shop
+                            <p>Add a new menu
 <h5>Authentication</h5>
 <p>This route requires a valid Authorization token set in headers</p></p>
                             <h5>Body Parameters:</h5>
@@ -359,59 +359,71 @@
               </tr>
             </thead>
             <tr>
-            <td class="name">name</td>
-            <td class="type">string</td>
+            <td class="name">Menu</td>
+            <td class="type">Object</td>
             
             
             <td class="description last"></td>
           </tr><tr>
-            <td class="name">description</td>
-            <td class="type">string</td>
+            <td class="name">Menu.name</td>
+            <td class="type">Object</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">Name of menu</td>
           </tr><tr>
-            <td class="name">siret</td>
-            <td class="type">string</td>
+            <td class="name">Menu.shopId</td>
+            <td class="type">Object</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">(optional) - ShopId link to this menu</td>
           </tr><tr>
-            <td class="name">address_line</td>
-            <td class="type">string</td>
+            <td class="name">Menu.categories</td>
+            <td class="type">Array.&lt;categories&gt;</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">Array of MenuCategory</td>
           </tr><tr>
-            <td class="name">address_line2</td>
+            <td class="name">Menu.categories[x].id</td>
             <td class="type">string</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">categoryId</td>
           </tr><tr>
-            <td class="name">city</td>
-            <td class="type">string</td>
+            <td class="name">Menu.categories[x].products</td>
+            <td class="type">Array.&lt;products&gt;</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">categoryId</td>
           </tr><tr>
-            <td class="name">state</td>
+            <td class="name">Menu.categories[x].products[y].id</td>
             <td class="type">string</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">productId</td>
           </tr><tr>
-            <td class="name">zip</td>
-            <td class="type">string</td>
+            <td class="name">Menu.categories[x].products[y].price</td>
+            <td class="type">Number</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">product price</td>
           </tr><tr>
-            <td class="name">country</td>
+            <td class="name">Menu.categories[x].products[y].options</td>
+            <td class="type">Array.&lt;options&gt;</td>
+            
+            
+            <td class="description last">(optional) - product options</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].options[z].id</td>
             <td class="type">string</td>
             
             
-            <td class="description last"></td>
+            <td class="description last">option id</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].options[z].price</td>
+            <td class="type">Number</td>
+            
+            
+            <td class="description last">option price</td>
           </tr>
           </table>
                             <h5>Response Code:</h5>
@@ -485,7 +497,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shop_routes.js.html">shop/routes.js</a>, <a href="shop_routes.js.html#line66">line 66</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line100">line 100</a>
     </li></ul></dd>
     
 
@@ -496,6 +508,30 @@
     
 </dl>
 
+
+        
+            <h3>Example</h3>
+            
+    <pre class="prettyprint"><code>// body params example
+{
+    "name": "L'utime carte des boissons",
+    "shopId": "a479ef51-1f6f-4e67-a323-d2ea06eda2e3",
+    "categories": [
+        {
+            "id": "ae8ce485-31d5-47be-b1f2-e57ebd132092",
+            "products": [
+                {
+                    "id": "07f7b05b-aec2-4848-a715-46883bde8c72",
+                    "price": 16,
+                    "options": [{
+                        "id": "1673d0cd-04dc-44b3-94a3-6894e0ce2358",
+                        "price": 28
+                    }]
+                }
+            ]
+        }
+    ]
+}</code></pre>
 
         
     
@@ -534,7 +570,7 @@
 
 <header>
     
-        <h2>Shop</h2>
+        <h2>Menu</h2>
         
     
 </header>
@@ -548,10 +584,10 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">PUT</td>
-                            <td class="name last">/shop/:shopId</td>
+                            <td class="name last">/menu/:menuId</td>
                             </tr>
                             </table>
-                            <p>Edit an existing shop
+                            <p>Edit an existing menu
 <h5>Authentication</h5>
 <p>This route requires a valid Authorization token set in headers</p></p>
                             <h5>Body Parameters:</h5>
@@ -567,54 +603,6 @@
             </thead>
             <tr>
             <td class="name">name</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">description</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">siret</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">address_line</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">address_line2</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">city</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">state</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">zip</td>
-            <td class="type">string</td>
-            
-            
-            <td class="description last"></td>
-          </tr><tr>
-            <td class="name">country</td>
             <td class="type">string</td>
             
             
@@ -692,7 +680,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shop_routes.js.html">shop/routes.js</a>, <a href="shop_routes.js.html#line102">line 102</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line268">line 268</a>
     </li></ul></dd>
     
 
@@ -741,7 +729,7 @@
 
 <header>
     
-        <h2>Shop</h2>
+        <h2>Menu</h2>
         
     
 </header>
@@ -755,13 +743,13 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">DELETE</td>
-                            <td class="name last">/shop/:shopId</td>
+                            <td class="name last">/menu/:menuId</td>
                             </tr>
                             </table>
-                            <p>Delete an existing shop
+                            <p>Delete an existing menu
 <h5>Authentication</h5>
 <p>This route requires a valid Authorization token set in headers</p></p>
-                            <h5>Query Parameters:</h5>
+                            <h5>Body Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -773,8 +761,8 @@
               </tr>
             </thead>
             <tr>
-            <td class="name">shopId</td>
-            <td class="type"></td>
+            <td class="name">name</td>
+            <td class="type">string</td>
             
             
             <td class="description last"></td>
@@ -851,7 +839,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shop_routes.js.html">shop/routes.js</a>, <a href="shop_routes.js.html#line144">line 144</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line290">line 290</a>
     </li></ul></dd>
     
 

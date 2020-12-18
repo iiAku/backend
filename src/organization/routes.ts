@@ -10,10 +10,10 @@ import {config} from '../config'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
-const isDev = config.env === 'dev'
 const prisma = new PrismaClient()
 // Const keyv = new Keyv("redis://organization:pass@localhost:6379")
 const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
+const isDev = process.env.NODE_ENV !== 'production'
 
 /**
  * Register a new organization
@@ -88,35 +88,86 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
       }
     }
   })
-  return reply
-    .setCookie(config.AUTH_COOKIE_NAME, token, {
-      sameSite: false,
-      secure: isDev ? false : true
-    })
-    .send({
-      data: {
-        session_token: token,
-        ...organization
-      },
-      message: messages.auth.LOGGED_IN
-    })
+  return reply.send({
+    data: {
+      session_token: token,
+      ...organization
+    },
+    message: messages.auth.LOGGED_IN
+  })
 }
 
 /**
- * Logout an organizationenticated organization
+ * Get an authenticated organization details
+ *
+ * @namespace Organization
+ * @path {GET} /organization
+ * @code {200} if the request is successful
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
+ * @code {500} if something went wrong
+ */
+const getHandler = async (request: any, reply: FastifyReply) => {
+  const {organizationId} = request.auth
+  const organization = await prisma.organization.findUnique({
+    where: {id: organizationId},
+    include: {
+      Menu: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      MenuProduct: {
+        select: {
+          id: true,
+          name: true,
+          description: true
+        }
+      },
+      MenuProductOption: {
+        select: {
+          id: true,
+          description: true
+        }
+      },
+      MenuCategory: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      Shop: {
+        select: {
+          id: true,
+          name: true
+        }
+      }
+    }
+  })
+
+  return reply.send({
+    data: {...organization},
+    message: null
+  })
+}
+
+/**
+ * Logout an authenticated organization
  *
  * @namespace Organization
  * @path {DELETE} /organization/logout
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const logoutHandler = async (request: any, reply: FastifyReply) => {
   const {id} = request.auth
   await Promise.all([prisma.auth.delete({where: {id}}), keyv.delete(id)])
-  reply.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
+  reply.code(200).send()
 }
 
 /**
@@ -125,15 +176,15 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Organization
  * @path {DELETE} /organization/logout-all
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const logoutAllHandler = async (request: any, reply: FastifyReply) => {
-  const {oid, id} = request.auth
+  const {organizationId, id} = request.auth
   await prisma.auth.deleteMany({
-    where: {oid, NOT: {id}}
+    where: {organizationId, NOT: {id}}
   })
   reply.code(200).send()
 }
@@ -201,7 +252,8 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
  * Reset password (wip - experimental)
  *
  * @namespace Organization
- * @path {POST} /organization/forgot-password
+ * @path {POST} /organization/reset-password/:resetToken
+ * @query resetToken Token parameter
  * @code {400} if missing parameters
  * @code {401} if invalid reset token organization with email
  * @code {200} if the request is successful
@@ -251,11 +303,10 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
  * @path {DELETE} /organization/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
- * @body {String} id Organization's id to delete
  */
 const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   const {id} = request.auth
@@ -264,10 +315,7 @@ const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   }
 
   await prisma.organization.delete({where: {id}})
-  reply
-    .code(200)
-    .clearCookie(config.AUTH_COOKIE_NAME)
-    .send({message: messages.auth.USER_DELETED})
+  reply.code(200).send({message: messages.auth.USER_DELETED})
 }
 
 const register = {
@@ -287,6 +335,11 @@ const register = {
 const login = {
   schema: register.schema,
   handler: loginHandler
+}
+
+const getOrganization = {
+  handler: getHandler,
+  preHandler: authPreHandler
 }
 
 const logout = {
@@ -339,6 +392,7 @@ const resetPassword = {
 
 // exported routes
 export const routes: RouteOptions[] = [
+  {method: 'GET', url: '/organization', ...getOrganization},
   {method: 'POST', url: '/organization/register', ...register},
   {method: 'POST', url: '/organization/login', ...login},
   {method: 'POST', url: '/organization/forgot-password', ...forgotPassword},
