@@ -15,7 +15,16 @@ export const options = {logger: true}
 export const build = (options = {}) => {
   const server = fastify(options)
   server.register(fastifyCookie)
-  server.register(fastifyCors)
+  server.register(fastifyCors, {
+    origin: (origin, cb) => {
+      if (
+        /localhost/.test(origin) ||
+        /bobdashboard\.herokuapp\.com/.test(origin)
+      ) {
+        return cb(null, true)
+      }
+    }
+  })
   for (const route of routes) {
     console.log(`${route.method} ${route.url}`)
     server.route(route)
