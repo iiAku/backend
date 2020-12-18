@@ -24,7 +24,15 @@ export const build = (options = {}) => {
         return cb(null, true)
       }
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET,PUT,POST,DELETE,UPDATE,OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'X-HTTP-Method-Override',
+      'Accept'
+    ]
   })
   for (const route of routes) {
     console.log(`${route.method} ${route.url}`)
