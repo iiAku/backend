@@ -45,9 +45,28 @@
                             <td class="name last">/menu-category/:categoryId</td>
                             </tr>
                             </table>
-                            <p>Get a menu-category from user
+                            <p>Get a menu-category from organization
 <h5>Authentication</h5>
 <p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">categoryId</td>
+            <td class="type"></td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
                             <h5>Response Code:</h5>
           <table class="params">
             <thead>
@@ -119,7 +138,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line14">line 14</a>
+        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -185,7 +204,7 @@
                             <td class="name last">/menu-category</td>
                             </tr>
                             </table>
-                            <p>Get all menu-category from user
+                            <p>Get all menu-category from organization
 <h5>Authentication</h5>
 <p>This route requires a valid token cookie set in headers</p></p>
                             <h5>Response Code:</h5>
@@ -259,7 +278,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line42">line 42</a>
+        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line38">line 38</a>
     </li></ul></dd>
     
 
@@ -418,7 +437,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line64">line 64</a>
+        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -506,147 +525,7 @@
             <td class="description last"></td>
           </tr>
           </table>
-                            <h5>Response Code:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            
-            <td class="type">200</td>
-            
-            
-            <td class="description last">if the request is successful</td>
-          </tr><tr>
-            
-            <td class="type">401</td>
-            
-            
-            <td class="description last">if no cookies or malformed cookie</td>
-          </tr><tr>
-            
-            <td class="type">403</td>
-            
-            
-            <td class="description last">if expired cookie</td>
-          </tr><tr>
-            
-            <td class="type">500</td>
-            
-            
-            <td class="description last">if something went wrong</td>
-          </tr>
-          </table></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line92">line 92</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>MenuCategory</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><h5>Route:</h5>
-                            <table class="params">
-                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
-                            <tr>
-                            <td class="type">DELETE</td>
-                            <td class="name last">/menu-category/:categoryId</td>
-                            </tr>
-                            </table>
-                            <p>Delete an existing menu-category
-<h5>Authentication</h5>
-<p>This route requires a valid token cookie set in headers</p></p>
-                            <h5>Body Parameters:</h5>
+                            <h5>Query Parameters:</h5>
           <table class="params">
             <thead>
               <tr>
@@ -658,8 +537,8 @@
               </tr>
             </thead>
             <tr>
-            <td class="name">name</td>
-            <td class="type">string</td>
+            <td class="name">categoryId</td>
+            <td class="type"></td>
             
             
             <td class="description last"></td>
@@ -736,7 +615,166 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line126">line 126</a>
+        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line88">line 88</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>MenuCategory</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">DELETE</td>
+                            <td class="name last">/menu-category/:categoryId</td>
+                            </tr>
+                            </table>
+                            <p>Delete an existing menu-category
+<h5>Authentication</h5>
+<p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">categoryId</td>
+            <td class="type"></td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">if the request is successful</td>
+          </tr><tr>
+            
+            <td class="type">401</td>
+            
+            
+            <td class="description last">if no cookies or malformed cookie</td>
+          </tr><tr>
+            
+            <td class="type">403</td>
+            
+            
+            <td class="description last">if expired cookie</td>
+          </tr><tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">if something went wrong</td>
+          </tr>
+          </table></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="menu_category.js.html">menu/category.js</a>, <a href="menu_category.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -787,7 +825,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Tue Dec 08 2020 17:25:21 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Dec 18 2020 16:37:10 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

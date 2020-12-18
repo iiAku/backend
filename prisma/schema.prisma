@@ -24,6 +24,7 @@ model Menu {
   name           String?
   Organization   Organization @relation(fields: [organizationId], references: [id])
   categories     categories[]
+  menus          menus[]
 
   @@id([id, organizationId])
 }
@@ -85,6 +86,7 @@ model Shop {
   zip            String
   country        String
   Organization   Organization @relation(fields: [organizationId], references: [id])
+  menus          menus[]
 
   @@id([id, organizationId])
 }
@@ -98,6 +100,16 @@ model categories {
   products     products[]
 
   @@id([menuId, categoryId])
+}
+
+model menus {
+  id     String @unique
+  menuId String
+  shopId String
+  Menu   Menu   @relation(fields: [menuId], references: [id])
+  Shop   Shop   @relation(fields: [shopId], references: [id])
+
+  @@id([menuId, shopId])
 }
 
 model options {

@@ -1,20 +1,14 @@
-import * as Keyv from 'keyv'
-
 import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
 import {RouteOptions} from 'fastify/types/route'
 import {authPreHandler} from '../utils'
-import {config} from '../config'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
-const isDev = config.env === 'dev'
 const prisma = new PrismaClient()
-// Const keyv = new Keyv("redis://user:pass@localhost:6379")
-const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 /**
- * Get a menu-product from user
+ * Get a menu-product from organization
  *
  * @namespace MenuProduct
  * @path {GET} /menu-product/:productId
@@ -44,7 +38,7 @@ const getProductHandler = async (request: any, reply: FastifyReply) => {
 }
 
 /**
- * Get all menu-product from user
+ * Get all menu-product from organization
  *
  * @namespace MenuProduct
  * @path {GET} /menu-product

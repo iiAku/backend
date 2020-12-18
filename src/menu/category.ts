@@ -1,23 +1,17 @@
-import * as Keyv from 'keyv'
-
 import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
 import {RouteOptions} from 'fastify/types/route'
 import {authPreHandler} from '../utils'
-import {config} from '../config'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
-const isDev = config.env === 'dev'
 const prisma = new PrismaClient()
-// Const keyv = new Keyv("redis://user:pass@localhost:6379")
-const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
-
 /**
- * Get a menu-category from user
+ * Get a menu-category from organization
  *
  * @namespace MenuCategory
  * @path {GET} /menu-category/:categoryId
+ * @query categoryId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -30,9 +24,9 @@ const getCategoryHandler = async (request: any, reply: FastifyReply) => {
   const {categoryId} = request.params
   const menuCategory = await prisma.menuCategory.findUnique({
     where: {
-      id_orgnanizationId: {
+      id_organizationId: {
         id: categoryId,
-        orgnanizationId: organizationId
+        organizationId
       }
     }
   })
@@ -44,7 +38,7 @@ const getCategoryHandler = async (request: any, reply: FastifyReply) => {
 }
 
 /**
- * Get all menu-category from user
+ * Get all menu-category from organization
  *
  * @namespace MenuCategory
  * @path {GET} /menu-category
@@ -58,7 +52,7 @@ const getCategoryHandler = async (request: any, reply: FastifyReply) => {
 const getAllCategoryHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
   const menuCategories = await prisma.menuCategory.findMany({
-    where: {orgnanizationId: organizationId}
+    where: {organizationId}
   })
   return reply.code(200).send({
     data: menuCategories,
@@ -100,6 +94,7 @@ const addCategoryHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuCategory
  * @path {PUT} /menu-category/:categoryId
+ * @query categoryId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -112,9 +107,9 @@ const editCategoryHandler = async (request: any, reply: FastifyReply) => {
   const {categoryId} = request.params
   const menuCategory = await prisma.menuCategory.update({
     where: {
-      id_orgnanizationId: {
+      id_organizationId: {
         id: categoryId,
-        orgnanizationId: organizationId
+        organizationId
       }
     },
     data: {
@@ -135,21 +130,21 @@ const editCategoryHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuCategory
  * @path {DELETE} /menu-category/:categoryId
+ * @query categoryId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {string} name
  */
 const deleteCategoryHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
   const {categoryId} = request.params
   const menuCategory = await prisma.menuCategory.delete({
     where: {
-      id_orgnanizationId: {
+      id_organizationId: {
         id: categoryId,
-        orgnanizationId: organizationId
+        organizationId
       }
     }
   })

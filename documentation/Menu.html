@@ -45,9 +45,28 @@
                             <td class="name last">/menu/:menuId</td>
                             </tr>
                             </table>
-                            <p>Get a menu from user
+                            <p>Get a menu from organization
 <h5>Authentication</h5>
 <p>This route requires a valid token cookie set in headers</p></p>
+                            <h5>Query Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">menuId</td>
+            <td class="type"></td>
+            
+            
+            <td class="description last"></td>
+          </tr>
+          </table>
                             <h5>Response Code:</h5>
           <table class="params">
             <thead>
@@ -119,7 +138,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line14">line 14</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -185,7 +204,7 @@
                             <td class="name last">/menu</td>
                             </tr>
                             </table>
-                            <p>Get all menu from user
+                            <p>Get all menu from organization
 <h5>Authentication</h5>
 <p>This route requires a valid token cookie set in headers</p></p>
                             <h5>Response Code:</h5>
@@ -259,7 +278,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line42">line 42</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -340,36 +359,71 @@
               </tr>
             </thead>
             <tr>
-            <td class="name">name</td>
-            <td class="type">string</td>
+            <td class="name">Menu</td>
+            <td class="type">Object</td>
             
             
             <td class="description last"></td>
-          </tr>
-          </table>
-                            <h5>Route Parameters:</h5>
-          <table class="params">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                
-                
-                <th class="last">Description</th>
-              </tr>
-            </thead>
-            <tr>
-            <td class="name">products</td>
-            <td class="type">[object Object]</td>
-            
-            
-            <td class="description last">undefined</td>
           </tr><tr>
-            <td class="name">options</td>
-            <td class="type">[object Object]</td>
+            <td class="name">Menu.name</td>
+            <td class="type">Object</td>
             
             
-            <td class="description last">undefined</td>
+            <td class="description last">Name of menu</td>
+          </tr><tr>
+            <td class="name">Menu.shopId</td>
+            <td class="type">Object</td>
+            
+            
+            <td class="description last">(optional) - ShopId link to this menu</td>
+          </tr><tr>
+            <td class="name">Menu.categories</td>
+            <td class="type">Array.&lt;categories&gt;</td>
+            
+            
+            <td class="description last">Array of MenuCategory</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].id</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last">categoryId</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products</td>
+            <td class="type">Array.&lt;products&gt;</td>
+            
+            
+            <td class="description last">categoryId</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].id</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last">productId</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].price</td>
+            <td class="type">Number</td>
+            
+            
+            <td class="description last">product price</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].options</td>
+            <td class="type">Array.&lt;options&gt;</td>
+            
+            
+            <td class="description last">(optional) - product options</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].options[z].id</td>
+            <td class="type">string</td>
+            
+            
+            <td class="description last">option id</td>
+          </tr><tr>
+            <td class="name">Menu.categories[x].products[y].options[z].price</td>
+            <td class="type">Number</td>
+            
+            
+            <td class="description last">option price</td>
           </tr>
           </table>
                             <h5>Response Code:</h5>
@@ -443,7 +497,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line64">line 64</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line100">line 100</a>
     </li></ul></dd>
     
 
@@ -454,6 +508,30 @@
     
 </dl>
 
+
+        
+            <h3>Example</h3>
+            
+    <pre class="prettyprint"><code>// body params example
+{
+    "name": "L'utime carte des boissons",
+    "shopId": "a479ef51-1f6f-4e67-a323-d2ea06eda2e3",
+    "categories": [
+        {
+            "id": "ae8ce485-31d5-47be-b1f2-e57ebd132092",
+            "products": [
+                {
+                    "id": "07f7b05b-aec2-4848-a715-46883bde8c72",
+                    "price": 16,
+                    "options": [{
+                        "id": "1673d0cd-04dc-44b3-94a3-6894e0ce2358",
+                        "price": 28
+                    }]
+                }
+            ]
+        }
+    ]
+}</code></pre>
 
         
     
@@ -602,7 +680,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line132">line 132</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line268">line 268</a>
     </li></ul></dd>
     
 
@@ -761,7 +839,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line166">line 166</a>
+        <a href="menu_routes.js.html">menu/routes.js</a>, <a href="menu_routes.js.html#line290">line 290</a>
     </li></ul></dd>
     
 
@@ -812,7 +890,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Tue Dec 08 2020 17:25:21 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Dec 18 2020 16:37:10 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

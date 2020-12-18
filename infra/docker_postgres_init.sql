@@ -74,6 +74,15 @@ CREATE TABLE "public"."MenuProductOption" (
   FOREIGN KEY ("organizationId") REFERENCES "public"."Organization" ("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE "public"."menus" (
+  "id" uuid NOT NULL UNIQUE,
+  "menuId" uuid NOT NULL,
+  "shopId" uuid NOT NULL,
+  PRIMARY KEY("menuId","shopId"),
+  FOREIGN KEY ("menuId") REFERENCES "public"."Menu" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY ("shopId") REFERENCES "public"."Shop" ("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 CREATE TABLE "public"."categories" (
   "id" uuid NOT NULL UNIQUE,
   "menuId" uuid NOT NULL,

@@ -113,12 +113,40 @@ const getHandler = async (request: any, reply: FastifyReply) => {
   const organization = await prisma.organization.findUnique({
     where: {id: organizationId},
     include: {
-      Menu: true,
-      MenuProduct: true,
-      MenuProductOption: true,
-      MenuCategory: true
+      Menu: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      MenuProduct: {
+        select: {
+          id: true,
+          name: true,
+          description: true
+        }
+      },
+      MenuProductOption: {
+        select: {
+          id: true,
+          description: true
+        }
+      },
+      MenuCategory: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      Shop: {
+        select: {
+          id: true,
+          name: true
+        }
+      }
     }
   })
+
   return reply.send({
     data: {...organization},
     message: null
@@ -224,7 +252,8 @@ const forgotPasswordHandler = async (request: any, reply: FastifyReply) => {
  * Reset password (wip - experimental)
  *
  * @namespace Organization
- * @path {POST} /organization/forgot-password
+ * @path {POST} /organization/reset-password/:resetToken
+ * @query resetToken Token parameter
  * @code {400} if missing parameters
  * @code {401} if invalid reset token organization with email
  * @code {200} if the request is successful
@@ -278,7 +307,6 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {String} id Organization's id to delete
  */
 const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   const {id} = request.auth

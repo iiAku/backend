@@ -4,21 +4,18 @@ import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
 import {RouteOptions} from 'fastify/types/route'
 import {authPreHandler} from '../utils'
-import {config} from '../config'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
-const isDev = config.env === 'dev'
 const prisma = new PrismaClient()
-// Const keyv = new Keyv("redis://user:pass@localhost:6379")
-const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 /**
- * Get a menu-option from user
+ * Get a menu-option from organization
  *
  * @namespace MenuProductOption
  * @path {GET} /menu-option/:optionId
  * @auth This route requires a valid token cookie set in headers
+ * @query optionId
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
@@ -44,7 +41,7 @@ const getProductOptionHandler = async (request: any, reply: FastifyReply) => {
 }
 
 /**
- * Get all menu-option from user
+ * Get all menu-option from organization
  *
  * @namespace MenuProductOption
  * @path {GET} /menu-option
@@ -79,7 +76,7 @@ const getAllProductOptionHandler = async (
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {string} name
+ * @body {string} description
  */
 const addProductOptionHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
@@ -108,7 +105,7 @@ const addProductOptionHandler = async (request: any, reply: FastifyReply) => {
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {string} name
+ * @body {string} description
  */
 const editProductOptionHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
@@ -138,12 +135,12 @@ const editProductOptionHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProductOption
  * @path {DELETE} /menu-option/:optionId
+ * @query optionId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {string} name
  */
 const deleteProductOptionHandler = async (
   request: any,

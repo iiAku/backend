@@ -8,16 +8,14 @@ import {config} from '../config'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
-const isDev = config.env === 'dev'
 const prisma = new PrismaClient()
-// Const keyv = new Keyv("redis://user:pass@localhost:6379")
-const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 
 /**
- * Get a shop from user
+ * Get a shop from organization
  *
  * @namespace Shop
  * @path {GET} /shop/:shopId
+ * @query shopId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
@@ -34,6 +32,9 @@ const getShopHandler = async (request: any, reply: FastifyReply) => {
         id: shopId,
         organizationId
       }
+    },
+    include: {
+      menus: true
     }
   })
   return reply.code(200).send({
@@ -43,7 +44,7 @@ const getShopHandler = async (request: any, reply: FastifyReply) => {
 }
 
 /**
- * Get all shop from user
+ * Get all shop from organization
  *
  * @namespace Shop
  * @path {GET} /shop
@@ -57,7 +58,10 @@ const getShopHandler = async (request: any, reply: FastifyReply) => {
 const getAllShopHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
   const shops = await prisma.shop.findMany({
-    where: {organizationId}
+    where: {organizationId},
+    include: {
+      menus: true
+    }
   })
   return reply.code(200).send({
     data: shops,
@@ -150,20 +154,12 @@ const editShopHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Shop
  * @path {DELETE} /shop/:shopId
+ * @query shopId
  * @auth This route requires a valid token cookie set in headers
  * @code {200} if the request is successful
  * @code {401} if no cookies or malformed cookie
  * @code {403} if expired cookie
  * @code {500} if something went wrong
- * @body {string} name
- * @body {string} description
- * @body {string} siret
- * @body {string} address_line
- * @body {string} address_line2
- * @body {string} city
- * @body {string} state
- * @body {string} zip
- * @body {string} country
  */
 const deleteShopHandler = async (request: any, reply: FastifyReply) => {
   const {organizationId} = request.auth
