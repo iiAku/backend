@@ -24,7 +24,6 @@
     "@types/uuid": "^8.3.0",
     "bcrypt": "^5.0.0",
     "fastify": "^3.7.0",
-    "fastify-cookie": "^4.1.0",
     "fastify-cors": "^5.0.0",
     "fs": "^0.0.1-security",
     "keyv": "^4.0.3",
