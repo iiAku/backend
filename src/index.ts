@@ -2,7 +2,6 @@ import fastify, {FastifyInstance} from 'fastify'
 
 import {AddressInfo} from 'net'
 import {RouteOptions} from 'fastify/types/route'
-import fastifyCookie from 'fastify-cookie'
 import fastifyCors from 'fastify-cors'
 import {routes as menuCategoryRoutes} from './menu/category'
 import {routes as menuProductOptionRoutes} from './menu/option'
@@ -25,7 +24,6 @@ export const HOST = process.env.PORT ? '0.0.0.0' : '127.0.0.1'
 export const options = {logger: true}
 export const build = (options = {}) => {
   const server = fastify(options)
-  server.register(fastifyCookie)
   server.register(fastifyCors)
   for (const route of routes) {
     console.log(`${route.method} ${route.url}`)

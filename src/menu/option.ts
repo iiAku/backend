@@ -1,5 +1,3 @@
-import * as Keyv from 'keyv'
-
 import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
 import {RouteOptions} from 'fastify/types/route'
@@ -14,11 +12,11 @@ const prisma = new PrismaClient()
  *
  * @namespace MenuProductOption
  * @path {GET} /menu-option/:optionId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @query optionId
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -45,10 +43,10 @@ const getProductOptionHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProductOption
  * @path {GET} /menu-option
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -71,10 +69,10 @@ const getAllProductOptionHandler = async (
  *
  * @namespace MenuProductOption
  * @path {POST} /menu-option
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} description
  */
@@ -100,10 +98,10 @@ const addProductOptionHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProductOption
  * @path {PUT} /menu-option/:optionId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} description
  */
@@ -136,10 +134,10 @@ const editProductOptionHandler = async (request: any, reply: FastifyReply) => {
  * @namespace MenuProductOption
  * @path {DELETE} /menu-option/:optionId
  * @query optionId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const deleteProductOptionHandler = async (

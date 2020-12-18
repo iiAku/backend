@@ -14,10 +14,10 @@ const prisma = new PrismaClient()
  * @namespace Menu
  * @path {GET} /menu/:menuId
  * @query menuId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -80,10 +80,10 @@ const getMenuHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Menu
  * @path {GET} /menu
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -107,10 +107,10 @@ const getAllMenuHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Menu
  * @path {POST} /menu
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {Object} Menu
  * @body {Object} Menu.name - Name of menu
@@ -282,10 +282,10 @@ const addMenuHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Menu
  * @path {PUT} /menu/:menuId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */
@@ -307,10 +307,10 @@ const editMenuHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Menu
  * @path {DELETE} /menu/:menuId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */

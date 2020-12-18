@@ -88,7 +88,7 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
       }
     }
   })
-  return reply.setCookie(config.AUTH_COOKIE_NAME, token).send({
+  return reply.send({
     data: {
       session_token: token,
       ...organization
@@ -103,9 +103,9 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Organization
  * @path {GET} /organization
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const getHandler = async (request: any, reply: FastifyReply) => {
@@ -159,15 +159,15 @@ const getHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Organization
  * @path {DELETE} /organization/logout
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const logoutHandler = async (request: any, reply: FastifyReply) => {
   const {id} = request.auth
   await Promise.all([prisma.auth.delete({where: {id}}), keyv.delete(id)])
-  reply.code(200).clearCookie(config.AUTH_COOKIE_NAME).send()
+  reply.code(200).send()
 }
 
 /**
@@ -176,9 +176,9 @@ const logoutHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Organization
  * @path {DELETE} /organization/logout-all
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const logoutAllHandler = async (request: any, reply: FastifyReply) => {
@@ -303,9 +303,9 @@ const resetPasswordHandler = async (request: any, reply: FastifyReply) => {
  * @path {DELETE} /organization/me
  * @code {400} if missing parameter
  * @code {200} if the request is successful
- * @auth This route requires a valid token cookie set in headers
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @auth This route requires a valid Authorization token set in headers
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const deleteMeHandler = async (request: any, reply: FastifyReply) => {
@@ -315,10 +315,7 @@ const deleteMeHandler = async (request: any, reply: FastifyReply) => {
   }
 
   await prisma.organization.delete({where: {id}})
-  reply
-    .code(200)
-    .clearCookie(config.AUTH_COOKIE_NAME)
-    .send({message: messages.auth.USER_DELETED})
+  reply.code(200).send({message: messages.auth.USER_DELETED})
 }
 
 const register = {

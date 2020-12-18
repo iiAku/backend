@@ -28,14 +28,13 @@ export const emailExist = async (email: string) => {
 
 export const authPreHandler = async (request: any, reply: FastifyReply) => {
   if (
-    !request.cookies ||
-    !(config.AUTH_COOKIE_NAME in request.cookies) ||
-    !isUUID(request.cookies[config.AUTH_COOKIE_NAME], 4)
+    !(config.AUTH_HEADER_NAME in request.headers) ||
+    !isUUID(request.headers[config.AUTH_HEADER_NAME], 4)
   ) {
-    return reply.code(401).send({message: messages.auth.INVALID_COOKIE})
+    return reply.code(401).send({message: messages.auth.INVALID_TOKEN})
   }
 
-  const {token} = request.cookies
+  const token = request.headers[config.AUTH_HEADER_NAME]
   let auth = await keyv.get(token)
 
   if (!auth) {
@@ -44,7 +43,7 @@ export const authPreHandler = async (request: any, reply: FastifyReply) => {
       include: {Organization: true}
     })
     if (!userFromToken) {
-      return reply.code(403).send({message: messages.auth.EXPIRED_COOKIE})
+      return reply.code(403).send({message: messages.auth.EXPIRED_TOKEN})
     }
 
     auth = userFromToken

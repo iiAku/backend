@@ -12,10 +12,10 @@ const prisma = new PrismaClient()
  * @namespace MenuCategory
  * @path {GET} /menu-category/:categoryId
  * @query categoryId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -42,10 +42,10 @@ const getCategoryHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuCategory
  * @path {GET} /menu-category
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -65,10 +65,10 @@ const getAllCategoryHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuCategory
  * @path {POST} /menu-category
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */
@@ -95,10 +95,10 @@ const addCategoryHandler = async (request: any, reply: FastifyReply) => {
  * @namespace MenuCategory
  * @path {PUT} /menu-category/:categoryId
  * @query categoryId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */
@@ -131,10 +131,10 @@ const editCategoryHandler = async (request: any, reply: FastifyReply) => {
  * @namespace MenuCategory
  * @path {DELETE} /menu-category/:categoryId
  * @query categoryId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const deleteCategoryHandler = async (request: any, reply: FastifyReply) => {

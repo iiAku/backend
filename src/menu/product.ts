@@ -12,10 +12,10 @@ const prisma = new PrismaClient()
  *
  * @namespace MenuProduct
  * @path {GET} /menu-product/:productId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -42,10 +42,10 @@ const getProductHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProduct
  * @path {GET} /menu-product
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -65,10 +65,10 @@ const getAllProductHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProduct
  * @path {POST} /menu-product
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */
@@ -94,10 +94,10 @@ const addProductHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProduct
  * @path {PUT} /menu-product/:productId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */
@@ -129,10 +129,10 @@ const editProductHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace MenuProduct
  * @path {DELETE} /menu-product/:productId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  */

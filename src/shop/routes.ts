@@ -1,10 +1,7 @@
-import * as Keyv from 'keyv'
-
 import {FastifyReply} from 'fastify'
 import {PrismaClient} from '@prisma/client'
 import {RouteOptions} from 'fastify/types/route'
 import {authPreHandler} from '../utils'
-import {config} from '../config'
 import {messages} from '../messages'
 import {v4 as uuidv4} from 'uuid'
 
@@ -16,10 +13,10 @@ const prisma = new PrismaClient()
  * @namespace Shop
  * @path {GET} /shop/:shopId
  * @query shopId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -48,10 +45,10 @@ const getShopHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Shop
  * @path {GET} /shop
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  *
  */
@@ -74,10 +71,10 @@ const getAllShopHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Shop
  * @path {POST} /shop
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  * @body {string} description
@@ -111,10 +108,10 @@ const addShopHandler = async (request: any, reply: FastifyReply) => {
  *
  * @namespace Shop
  * @path {PUT} /shop/:shopId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  * @body {string} name
  * @body {string} description
@@ -155,10 +152,10 @@ const editShopHandler = async (request: any, reply: FastifyReply) => {
  * @namespace Shop
  * @path {DELETE} /shop/:shopId
  * @query shopId
- * @auth This route requires a valid token cookie set in headers
+ * @auth This route requires a valid Authorization token set in headers
  * @code {200} if the request is successful
- * @code {401} if no cookies or malformed cookie
- * @code {403} if expired cookie
+ * @code {401} if no token or malformed token
+ * @code {403} if expired token
  * @code {500} if something went wrong
  */
 const deleteShopHandler = async (request: any, reply: FastifyReply) => {
