@@ -88,13 +88,18 @@ const loginHandler = async (request: any, reply: FastifyReply) => {
       }
     }
   })
-  return reply.setCookie(config.AUTH_COOKIE_NAME, token).send({
-    data: {
-      session_token: token,
-      ...organization
-    },
-    message: messages.auth.LOGGED_IN
-  })
+  return reply
+    .setCookie(config.AUTH_COOKIE_NAME, token, {
+      sameSite: false,
+      secure: isDev ? false : true
+    })
+    .send({
+      data: {
+        session_token: token,
+        ...organization
+      },
+      message: messages.auth.LOGGED_IN
+    })
 }
 
 /**
