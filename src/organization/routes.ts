@@ -342,6 +342,10 @@ const getOrganization = {
   preHandler: authPreHandler
 }
 
+const getOrganizationSchema = {
+  handler: () => reply.code(200).send(register.schema)
+}
+
 const logout = {
   handler: logoutHandler,
   preHandler: authPreHandler
@@ -392,6 +396,7 @@ const resetPassword = {
 
 // exported routes
 export const routes: RouteOptions[] = [
+  {method: 'GET', url: '/organization/schema', ...getOrganizationSchema},
   {method: 'GET', url: '/organization', ...getOrganization},
   {method: 'POST', url: '/organization/register', ...register},
   {method: 'POST', url: '/organization/login', ...login},
