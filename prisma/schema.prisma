@@ -8,20 +8,20 @@ datasource db {
 }
 
 model Auth {
-  id             String       @unique
-  organizationId String
-  ip             String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now())
+  id             String       @unique @db.Uuid
+  organizationId String       @db.Uuid
+  ip             String?      @db.VarChar(45)
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @default(now()) @db.Timestamp(6)
   Organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@id([id, organizationId])
 }
 
 model Menu {
-  id             String       @unique
-  organizationId String
-  name           String?
+  id             String       @unique @db.Uuid
+  organizationId String       @db.Uuid
+  name           String?      @db.VarChar(255)
   Organization   Organization @relation(fields: [organizationId], references: [id])
   categories     categories[]
   menus          menus[]
@@ -30,9 +30,9 @@ model Menu {
 }
 
 model MenuCategory {
-  id             String       @unique
-  organizationId String
-  name           String?
+  id             String       @unique @db.Uuid
+  organizationId String       @db.Uuid
+  name           String?      @db.VarChar(45)
   Organization   Organization @relation(fields: [organizationId], references: [id])
   categories     categories[]
 
@@ -40,10 +40,10 @@ model MenuCategory {
 }
 
 model MenuProduct {
-  id             String       @unique
-  organizationId String
-  name           String
-  description    String?
+  id             String       @unique @db.Uuid
+  organizationId String       @db.Uuid
+  name           String       @db.VarChar(45)
+  description    String?      @db.VarChar(255)
   Organization   Organization @relation(fields: [organizationId], references: [id])
   products       products[]
 
@@ -51,9 +51,9 @@ model MenuProduct {
 }
 
 model MenuProductOption {
-  id             String       @unique
-  organizationId String
-  description    String?
+  id             String       @unique @db.Uuid
+  organizationId String       @db.Uuid
+  description    String?      @db.VarChar(255)
   Organization   Organization @relation(fields: [organizationId], references: [id])
   options        options[]
 
@@ -61,10 +61,10 @@ model MenuProductOption {
 }
 
 model Organization {
-  id                String              @id
-  email             String              @unique
-  password          String
-  createdAt         DateTime            @default(now())
+  id                String              @id @db.Uuid
+  email             String              @unique @db.VarChar(255)
+  password          String              @db.VarChar(255)
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
   Auth              Auth[]
   Menu              Menu[]
   MenuCategory      MenuCategory[]
@@ -74,17 +74,17 @@ model Organization {
 }
 
 model Shop {
-  id             String       @unique
-  organizationId String
-  name           String
-  description    String?
-  siret          String
-  address_line   String
-  address_line2  String?
-  city           String
-  state          String
-  zip            String
-  country        String
+  id             String       @unique @db.Uuid
+  organizationId String       @db.Uuid
+  name           String       @db.VarChar(255)
+  description    String?      @db.VarChar(255)
+  siret          String       @db.VarChar(14)
+  address_line   String       @db.VarChar(255)
+  address_line2  String?      @db.VarChar(255)
+  city           String       @db.VarChar(255)
+  state          String       @db.VarChar(255)
+  zip            String       @db.VarChar(255)
+  country        String       @db.VarChar(255)
   Organization   Organization @relation(fields: [organizationId], references: [id])
   menus          menus[]
 
@@ -92,9 +92,9 @@ model Shop {
 }
 
 model categories {
-  id           String       @unique
-  menuId       String
-  categoryId   String
+  id           String       @unique @db.Uuid
+  menuId       String       @db.Uuid
+  categoryId   String       @db.Uuid
   MenuCategory MenuCategory @relation(fields: [categoryId], references: [id])
   Menu         Menu         @relation(fields: [menuId], references: [id])
   products     products[]
@@ -103,9 +103,9 @@ model categories {
 }
 
 model menus {
-  id     String @unique
-  menuId String
-  shopId String
+  id     String @unique @db.Uuid
+  menuId String @db.Uuid
+  shopId String @db.Uuid
   Menu   Menu   @relation(fields: [menuId], references: [id])
   Shop   Shop   @relation(fields: [shopId], references: [id])
 
@@ -113,10 +113,10 @@ model menus {
 }
 
 model options {
-  id                String            @unique
-  productId         String
-  optionId          String
-  price             Int
+  id                String            @unique @db.Uuid
+  productId         String            @db.Uuid
+  optionId          String            @db.Uuid
+  price             Int               @db.SmallInt
   MenuProductOption MenuProductOption @relation(fields: [optionId], references: [id])
   products          products          @relation(fields: [productId], references: [id])
 
@@ -124,10 +124,10 @@ model options {
 }
 
 model products {
-  id           String      @unique
-  productId    String
-  categoriesId String
-  price        Int
+  id           String      @unique @db.Uuid
+  productId    String      @db.Uuid
+  categoriesId String      @db.Uuid
+  price        Int         @db.SmallInt
   categories   categories  @relation(fields: [categoriesId], references: [id])
   MenuProduct  MenuProduct @relation(fields: [productId], references: [id])
   options      options[]
