@@ -16,6 +16,16 @@ const keyv = new Keyv({serialize: JSON.stringify, deserialize: JSON.parse})
 const isDev = process.env.NODE_ENV !== 'production'
 
 /**
+ * Get organization registration schema
+ *
+ * @namespace Organization
+ * @path {GET} /organization/register
+ * @code {200} if the request is successful
+ */
+const registerSchemaHandler = async (request: any, reply: FastifyReply) =>
+  reply.code(200).send(register.schema)
+
+/**
  * Register a new organization
  *
  * @namespace Organization
@@ -343,7 +353,7 @@ const getOrganization = {
 }
 
 const getOrganizationSchema = {
-  handler: () => reply.code(200).send(register.schema)
+  handler: registerSchemaHandler
 }
 
 const logout = {
